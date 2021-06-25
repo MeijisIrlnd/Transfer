@@ -22,6 +22,7 @@ CommandLineDistortionAudioProcessor::CommandLineDistortionAudioProcessor()
                        )
 #endif
 {
+    ctx.addBuiltIns();
 }
 
 CommandLineDistortionAudioProcessor::~CommandLineDistortionAudioProcessor()
@@ -170,8 +171,8 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 void CommandLineDistortionAudioProcessor::setContext(const std::string& expr)
 {
-    context.reset(new ExpressionContext(expr, currentCoefficient, currentZ));
-    krunch.setShapingFunction(context->processFunction);
+    context.reset(new Expression(ctx, expr, currentCoefficient, currentZ));
+    krunch.setShapingFunction(context->getTransferFunction());
 }
 
 void CommandLineDistortionAudioProcessor::setDistortionCoefficient(double newCoefficient)

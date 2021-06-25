@@ -9,7 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "ExpressionParser.h"
+#include "Expression.h"
 #include "KrunchProcessor.h"
 //==============================================================================
 /**
@@ -58,7 +58,8 @@ public:
     void setDistortionCoefficient(double newCoefficient);
     void setZ(double newZ);
 private:
-    std::unique_ptr<ExpressionContext> context;
+    mathpresso::Context ctx;
+    std::unique_ptr<Expression> context;
     DSPCommon::KrunchProcessor<float> krunch;
     double currentCoefficient = 1;
     double currentZ = 0;

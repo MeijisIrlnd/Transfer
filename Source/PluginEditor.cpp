@@ -41,7 +41,7 @@ CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEd
     helpBlock.setMultiLine(true);
     //atan(x*d) * 1/z
     helpBlock.setText(
-        "Variables:\nx = Input Sample\nd = Distortion Coefficient\nz = User Defined, 0 to 1\n\nFunctions:\nsin(), cos(), tan()\nasin(), acos(), atan(), tanh()\npow(base, exponent), sqrt(base)\n+, -, *, /\n", false
+        "Variables:\nx = Input Sample\nd = Distortion Coefficient\nz = User Defined, 0 to 1\nE = 2.7182818284590452354\nPI = 3.14159265358979323846\n\nFunctions:\nsin(x), cos(x), tan(x)\nasin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x)\npow(x, y), sqrt(x)\nlog(x), log2(x), log10(x)\nfrac(x), recip(x)\nmin(x,y), max(x,y)\navg(x,y), ceil(x), floor(x)\nround(x), roundeven(x), trunc(x)\nsignbit(x), copysign(x)\n\nOperators:\n+, -, *, /, %\n!(x), -(x)\n", false
     );
     helpBlock.setReadOnly(true);
     addAndMakeVisible(&helpBlock);
@@ -71,6 +71,7 @@ CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEd
 
 CommandLineDistortionAudioProcessorEditor::~CommandLineDistortionAudioProcessorEditor()
 {
+    setLookAndFeel(nullptr);
 }
 
 //==============================================================================

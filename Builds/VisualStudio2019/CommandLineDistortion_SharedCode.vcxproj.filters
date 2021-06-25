@@ -454,9 +454,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\CMathParser.cpp">
-      <Filter>CommandLineDistortion\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp">
       <Filter>CommandLineDistortion\Source</Filter>
     </ClCompile>
@@ -2607,13 +2604,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Expression.h">
+      <Filter>CommandLineDistortion\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\UI\LF.h">
       <Filter>CommandLineDistortion\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\KrunchProcessor.h">
-      <Filter>CommandLineDistortion\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ExpressionParser.h">
       <Filter>CommandLineDistortion\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PluginProcessor.h">
