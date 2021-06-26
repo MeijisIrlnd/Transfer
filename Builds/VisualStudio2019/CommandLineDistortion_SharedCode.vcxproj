@@ -2146,8 +2146,9 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Expression.h"/>
+    <ClInclude Include="..\..\Source\UI\Graphing.h"/>
     <ClInclude Include="..\..\Source\UI\LF.h"/>
+    <ClInclude Include="..\..\Source\Expression.h"/>
     <ClInclude Include="..\..\Source\KrunchProcessor.h"/>
     <ClInclude Include="..\..\Source\PluginProcessor.h"/>
     <ClInclude Include="..\..\Source\PluginEditor.h"/>

@@ -55,6 +55,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     void setContext(const std::string& expression);
+    mathpresso::Expression* getMathExpr();
     void setDistortionCoefficient(double newCoefficient);
     void setZ(double newZ);
 private:
@@ -63,6 +64,7 @@ private:
     DSPCommon::KrunchProcessor<float> krunch;
     double currentCoefficient = 1;
     double currentZ = 0;
+    juce::AudioProcessorValueTreeState parameterTree;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CommandLineDistortionAudioProcessor)
 };

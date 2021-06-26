@@ -19,10 +19,16 @@ CommandLineDistortionAudioProcessor::CommandLineDistortionAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+     ), parameterTree(*this, nullptr, juce::Identifier("CMDistortion"), {
+         std::make_unique<juce::AudioParameterFloat>("coeff", "Distortion Coefficient", 1, 10, 1),
+         std::make_unique<juce::AudioParameterFloat>("z", "Z", 0, 1, 0)
+})
 #endif
 {
     ctx.addBuiltIns();
+    juce::ValueTree subTree("StringParams");
+    subTree.setProperty("function", "", nullptr);
+    parameterTree.state.addChild(subTree, 1, nullptr);
 }
 
 CommandLineDistortionAudioProcessor::~CommandLineDistortionAudioProcessor()
@@ -151,9 +157,9 @@ juce::AudioProcessorEditor* CommandLineDistortionAudioProcessor::createEditor()
 //==============================================================================
 void CommandLineDistortionAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto state = parameterTree.copyState();
+    std::unique_ptr<juce::XmlElement> xmlState(state.createXml());
+    copyXmlToBinary(*xmlState, destData);
 }
 
 void CommandLineDistortionAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -171,8 +177,19 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 void CommandLineDistortionAudioProcessor::setContext(const std::string& expr)
 {
+    parameterTree.state.getChild(1).setProperty("function", juce::String(expr), nullptr);
     context.reset(new Expression(ctx, expr, currentCoefficient, currentZ));
     krunch.setShapingFunction(context->getTransferFunction());
+}
+
+mathpresso::Expression* CommandLineDistortionAudioProcessor::getMathExpr()
+{
+    if (context != nullptr) {
+        return context->getExpr();
+    }
+    else {
+        return nullptr;
+    }
 }
 
 void CommandLineDistortionAudioProcessor::setDistortionCoefficient(double newCoefficient)

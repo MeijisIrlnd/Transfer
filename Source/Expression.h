@@ -34,6 +34,7 @@ struct Expression
     }
 
     std::function<float(float)>& getTransferFunction() { return transferFunction;  }
+    mathpresso::Expression* getExpr() { return &exp; }
 
     void setDistortionCoefficient(float newDistortionCoefficient) {
         distortionCoefficient = newDistortionCoefficient;

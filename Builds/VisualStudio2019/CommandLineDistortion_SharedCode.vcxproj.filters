@@ -5,6 +5,9 @@
     <Filter Include="CommandLineDistortion\Resources">
       <UniqueIdentifier>{DA2B4002-255A-F7D5-F4A8-11DF31F06F09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CommandLineDistortion\Source\UI">
+      <UniqueIdentifier>{00A805FB-92B9-03FC-1B1B-6665EEB203B7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="CommandLineDistortion\Source">
       <UniqueIdentifier>{DA772D9F-CC45-671C-40DA-790CBCB984C0}</UniqueIdentifier>
     </Filter>
@@ -2604,10 +2607,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Expression.h">
-      <Filter>CommandLineDistortion\Source</Filter>
+    <ClInclude Include="..\..\Source\UI\Graphing.h">
+      <Filter>CommandLineDistortion\Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\UI\LF.h">
+      <Filter>CommandLineDistortion\Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Expression.h">
       <Filter>CommandLineDistortion\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\KrunchProcessor.h">

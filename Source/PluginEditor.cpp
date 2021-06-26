@@ -17,6 +17,7 @@ CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEd
     // editor's size to whatever you need it to be.
     setSize (800, 600);
     setLookAndFeel(&lookAndFeel);
+    addAndMakeVisible(&graphing);
     expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
     expressionLabel.setText("Transfer Function:", juce::dontSendNotification);
     expressionInput.setFont(lookAndFeel.getFont());
@@ -35,7 +36,7 @@ CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEd
     helpBlock.setColour(juce::TextEditor::textColourId, juce::Colour(100, 100, 100));
     expressionInput.onReturnKey = [this] {
         audioProcessor.setContext(expressionInput.getText().toStdString());
-
+        graphing.updateExpr(audioProcessor.getMathExpr());
     };
     addAndMakeVisible(&expressionInput);
     helpBlock.setMultiLine(true);
@@ -55,6 +56,7 @@ CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEd
     addAndMakeVisible(&distortionCoefficientSlider);
     distortionCoefficientSlider.onValueChange = [this] {
         audioProcessor.setDistortionCoefficient(distortionCoefficientSlider.getValue());
+        graphing.setDistortionCoeff(distortionCoefficientSlider.getValue());
     };
     zLabel.setJustificationType(juce::Justification::centredTop);
     zLabel.setText("Z", juce::dontSendNotification);
@@ -66,6 +68,7 @@ CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEd
     addAndMakeVisible(&zSlider);
     zSlider.onValueChange = [this] {
         audioProcessor.setZ(zSlider.getValue());
+        graphing.setZ(zSlider.getValue());
     };
 }
 
@@ -88,7 +91,8 @@ void CommandLineDistortionAudioProcessorEditor::resized()
     expressionLabel.setBounds(0, 0, getWidth(), h);
     yLabel.setBounds(0, h, getWidth() / 24, h);
     expressionInput.setBounds(getWidth() / 24, h, getWidth(), h);
-    helpBlock.setBounds(0, h*2, getWidth(), getHeight() - h*3);
+    helpBlock.setBounds(0, h*2, getWidth()/2, getHeight() - h*3);
+    graphing.setBounds(getWidth() / 2, (h*2) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
     distortionCoefficientLabel.setBounds(0, getHeight() - (h * 2), getWidth() / 4, h );
     distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 2), getWidth() - getWidth() / 4, h / 4);
     zLabel.setBounds(0, getHeight() - h, getWidth() / 4, h);

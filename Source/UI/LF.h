@@ -19,6 +19,7 @@ public:
         setColour(juce::ResizableWindow::backgroundColourId, juce::Colour(200, 200, 200));
         setColour(juce::TextEditor::backgroundColourId, juce::Colour(200, 200, 200));
         setColour(juce::TextEditor::textColourId, juce::Colours::black);
+        setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentWhite);
         setColour(juce::Label::textColourId, juce::Colours::black);
         setColour(juce::TextEditor::outlineColourId, juce::Colour(200, 200, 200));
         font = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::DroidSansMono_ttf, BinaryData::DroidSansMono_ttfSize));

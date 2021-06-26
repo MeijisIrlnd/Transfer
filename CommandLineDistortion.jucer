@@ -9,8 +9,11 @@
             file="Resources/DroidSansMono.ttf"/>
     </GROUP>
     <GROUP id="{73CA8955-08EF-024C-8468-EC8881CF4BB9}" name="Source">
+      <GROUP id="{D844BC4C-77AF-570B-44AF-D0C6DD78DFCA}" name="UI">
+        <FILE id="Lq33Ex" name="Graphing.h" compile="0" resource="0" file="Source/UI/Graphing.h"/>
+        <FILE id="lGhxlt" name="LF.h" compile="0" resource="0" file="Source/UI/LF.h"/>
+      </GROUP>
       <FILE id="tGAovB" name="Expression.h" compile="0" resource="0" file="Source/Expression.h"/>
-      <FILE id="lGhxlt" name="LF.h" compile="0" resource="0" file="Source/UI/LF.h"/>
       <FILE id="R2F0U2" name="KrunchProcessor.h" compile="0" resource="0"
             file="Source/KrunchProcessor.h"/>
       <FILE id="gSobzP" name="PluginProcessor.cpp" compile="1" resource="0"

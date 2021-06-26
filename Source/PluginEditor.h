@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "UI/LF.h"
+#include "UI/Graphing.h"
 //==============================================================================
 /**
 */
@@ -33,6 +34,6 @@ private:
     juce::Slider distortionCoefficientSlider, zSlider;
     CommandLineDistortionAudioProcessor& audioProcessor;
     LF lookAndFeel;
-
+    Graphing graphing;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CommandLineDistortionAudioProcessorEditor)
 };
