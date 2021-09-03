@@ -1,4 +1,4 @@
-# CMDistortion
+# Transfer
 
 What if distortion but you have to type in the transfer function yourself and that's the whole UI? 
 
