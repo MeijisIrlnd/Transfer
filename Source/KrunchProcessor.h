@@ -11,22 +11,48 @@
 #pragma once
 #include <JuceHeader.h>
 #include <DSPCommon.h>
+#include "KalexpanderProcessor.h"
 
-namespace DSPCommon
-{
     template <typename T> 
     class KrunchProcessor
     {
     public: 
-        KrunchProcessor<T>()
+        KrunchProcessor<T>(juce::AudioProcessorValueTreeState& t) : tree(t), inputGate(t)
         {
-            waveshapers.add(new Shaper<T>());
-            waveshapers.add(new Shaper<T>());
+            waveshapers.add(new DSPCommon::Shaper<T>());
+            waveshapers.add(new DSPCommon::Shaper<T>());
+
         }
 
         ~KrunchProcessor()
         {
 
+        }
+
+
+        void toggleGate(bool newState)
+        {
+            gateState = newState;
+        }
+
+        void setGateThreshold(double newThreshold)
+        {
+            inputGate.setThreshold(newThreshold);
+        }
+
+        void setGateRatio(double newRatio)
+        {
+            inputGate.setRatio(newRatio);
+        }
+
+        void setGateAttack(double newAttack)
+        {
+            inputGate.setAttack(newAttack);
+        }
+
+        void setGateRelease(double newRelease)
+        {
+            inputGate.setRelease(newRelease);
         }
 
         void setGain(double newGain) {
@@ -37,12 +63,15 @@ namespace DSPCommon
 
         void setDistortionCoefficient(double newDistortionCoefficient)
         {
-            for (auto& shaper : waveshapers) {
-                shaper->setDistortionCoefficient(newDistortionCoefficient);
+            storedCoefficient = newDistortionCoefficient;
+            if (hasBeenPrepared) {
+                for (auto& shaper : waveshapers) {
+                    shaper->setDistortionCoefficient(newDistortionCoefficient);
+                }
             }
         }
 
-        void setShapingFunction(DSPShaping::FUNCTION f)
+        void setShapingFunction(DSPCommon::DSPShaping::FUNCTION f)
         {
             for (auto& shaper : waveshapers) {
                 shaper->setShaperFunction(f);
@@ -51,8 +80,11 @@ namespace DSPCommon
 
         void setShapingFunction(std::function<T(T)>& f)
         {
-            for (auto& shaper : waveshapers) {
-                shaper->setShaperFunction(f);
+            storedTransfer = f;
+            if (hasBeenPrepared) {
+                for (auto& shaper : waveshapers) {
+                    shaper->setShaperFunction(f);
+                }
             }
         }
 
@@ -61,7 +93,12 @@ namespace DSPCommon
             for (auto& shaper : waveshapers) {
                 shaper->prepare(spb, sampleRate);
                 shaper->setGain(1);
+                shaper->setShaperFunction(storedTransfer);
+                shaper->setDistortionCoefficient(storedCoefficient);
+                
             }
+            inputGate.prepare(spb, sampleRate);
+            hasBeenPrepared = true;
         }
 
         void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
@@ -71,7 +108,10 @@ namespace DSPCommon
             for (auto sample = 0; sample < bufferToFill.numSamples; sample++)
             {
                 for (auto channel = 0; channel < bufferToFill.buffer->getNumChannels(); channel++) {
-                    write[channel][sample] = waveshapers[channel]->getNextSample(read[channel][sample]);
+                    auto s = gateState ? inputGate.processSample(channel, read[channel][sample]) : read[channel][sample];
+                    s = waveshapers[channel]->getNextSample(s);
+                    if (std::isnan(s) || std::isinf(s)) s = 0;
+                    write[channel][sample] = s;
                 }
             }
         }
@@ -79,9 +119,15 @@ namespace DSPCommon
         void release()
         {
             for (auto& shaper : waveshapers) shaper->release();
+            inputGate.release();
         }
 
     private:
         juce::OwnedArray<DSPCommon::Shaper<T> > waveshapers;
+        DSPCommon::Kalexpander<T> inputGate;
+        bool gateState = true;
+        juce::AudioProcessorValueTreeState& tree; 
+        std::function<float(float)> storedTransfer;
+        double storedCoefficient = 1;
+        bool hasBeenPrepared = false;
     };
-}

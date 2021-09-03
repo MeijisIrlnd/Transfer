@@ -2,17 +2,17 @@
 
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="CommandLineDistortion\Resources">
-      <UniqueIdentifier>{DA2B4002-255A-F7D5-F4A8-11DF31F06F09}</UniqueIdentifier>
+    <Filter Include="Transfer\Resources">
+      <UniqueIdentifier>{9DA0AE48-6C4F-A6D9-C500-E592430C4E90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CommandLineDistortion\Source\UI">
-      <UniqueIdentifier>{00A805FB-92B9-03FC-1B1B-6665EEB203B7}</UniqueIdentifier>
+    <Filter Include="Transfer\Source\UI">
+      <UniqueIdentifier>{F58FEEF9-DF09-FFC2-8077-5F2D83E15EE8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CommandLineDistortion\Source">
-      <UniqueIdentifier>{DA772D9F-CC45-671C-40DA-790CBCB984C0}</UniqueIdentifier>
+    <Filter Include="Transfer\Source">
+      <UniqueIdentifier>{6AB5A52F-BBCE-045E-3B46-77FAE3372B3D}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CommandLineDistortion">
-      <UniqueIdentifier>{CA62B941-DD4F-2957-8694-A2CA99DB1639}</UniqueIdentifier>
+    <Filter Include="Transfer">
+      <UniqueIdentifier>{0A5D1F43-38ED-3A42-8998-351C084424FB}</UniqueIdentifier>
     </Filter>
     <Filter Include="JUCE Modules\juce_audio_basics\audio_play_head">
       <UniqueIdentifier>{EB58F05A-A968-CEBE-40C4-107CDD8F240F}</UniqueIdentifier>
@@ -458,10 +458,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp">
-      <Filter>CommandLineDistortion\Source</Filter>
+      <Filter>Transfer\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PluginEditor.cpp">
-      <Filter>CommandLineDistortion\Source</Filter>
+      <Filter>Transfer\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\..\Program Files\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
       <Filter>JUCE Modules\juce_audio_basics\buffers</Filter>
@@ -2608,31 +2608,31 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\KalexpanderProcessor.h">
-      <Filter>CommandLineDistortion\Source</Filter>
+      <Filter>Transfer\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\UI\GatePanel.h">
-      <Filter>CommandLineDistortion\Source\UI</Filter>
+      <Filter>Transfer\Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\UI\Graphing.h">
-      <Filter>CommandLineDistortion\Source\UI</Filter>
+      <Filter>Transfer\Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\UI\LabelButton.h">
-      <Filter>CommandLineDistortion\Source\UI</Filter>
+      <Filter>Transfer\Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\UI\LF.h">
-      <Filter>CommandLineDistortion\Source\UI</Filter>
+      <Filter>Transfer\Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Expression.h">
-      <Filter>CommandLineDistortion\Source</Filter>
+      <Filter>Transfer\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\KrunchProcessor.h">
-      <Filter>CommandLineDistortion\Source</Filter>
+      <Filter>Transfer\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PluginProcessor.h">
-      <Filter>CommandLineDistortion\Source</Filter>
+      <Filter>Transfer\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PluginEditor.h">
-      <Filter>CommandLineDistortion\Source</Filter>
+      <Filter>Transfer\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\Program Files\JUCE\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h">
       <Filter>JUCE Modules\juce_audio_basics\audio_play_head</Filter>
@@ -4983,7 +4983,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Resources\DroidSansMono.ttf">
-      <Filter>CommandLineDistortion\Resources</Filter>
+      <Filter>Transfer\Resources</Filter>
     </None>
     <None Include="..\..\..\..\..\..\..\Program Files\JUCE\modules\juce_audio_devices\native\oboe\CMakeLists.txt">
       <Filter>JUCE Modules\juce_audio_devices\native\oboe</Filter>

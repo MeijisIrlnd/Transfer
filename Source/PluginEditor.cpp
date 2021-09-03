@@ -10,8 +10,9 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEditor (CommandLineDistortionAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcessor& p, juce::AudioProcessorValueTreeState& t)
+    : AudioProcessorEditor (&p), audioProcessor (p), tree(t), gatePanel(tree), graphButton("Graph", juce::Colour(200, 200, 200), true), 
+    gateButton("Gate", juce::Colour(200, 200, 200), true), graphing(tree)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -21,7 +22,16 @@ CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEd
     expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
     expressionLabel.setText("Transfer Function:", juce::dontSendNotification);
     expressionInput.setFont(lookAndFeel.getFont());
-    expressionInput.setText("tanh(x*d)", juce::dontSendNotification);
+    std::string ipText = tree.state.getChildWithName("Function").getProperty("Function").toString().toStdString();
+    expressionInput.setText(ipText, juce::dontSendNotification);
+    graphing.updateExpr(expressionInput.getText().toStdString());
+    auto dParam = tree.getParameter("D");
+    auto dv = dParam->getNormalisableRange().convertFrom0to1(dParam->getValue());
+    graphing.setDistortionCoeff(dv);
+    auto zParam = tree.getParameter("Z");
+    auto dz = zParam->getNormalisableRange().convertFrom0to1(zParam->getValue());
+    graphing.setZ(dz);
+
     addAndMakeVisible(&expressionLabel);
 
     yLabel.setColour(juce::TextEditor::textColourId, juce::Colours::black);
@@ -30,13 +40,27 @@ CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEd
     yLabel.setFont(lookAndFeel.getFont());
 
     addAndMakeVisible(&yLabel);
+    addAndMakeVisible(&gatePanel);
+    gatePanel.setVisible(false);
+    addAndMakeVisible(&graphButton);
+    addAndMakeVisible(&gateButton);
+
+    graphButton.addListener(this);
+    gateButton.addListener(this);
+    
 
 
     helpBlock.setFont(lookAndFeel.getFont());
     helpBlock.setColour(juce::TextEditor::textColourId, juce::Colour(100, 100, 100));
     expressionInput.onReturnKey = [this] {
-        audioProcessor.setContext(expressionInput.getText().toStdString());
-        graphing.updateExpr(audioProcessor.getMathExpr());
+        try {
+            audioProcessor.setContext(expressionInput.getText().toStdString());
+            graphing.updateExpr(expressionInput.getText().toStdString());
+            
+        }
+        catch(std::exception& e){
+            //Don't
+        }
     };
     addAndMakeVisible(&expressionInput);
     helpBlock.setMultiLine(true);
@@ -51,48 +75,55 @@ CommandLineDistortionAudioProcessorEditor::CommandLineDistortionAudioProcessorEd
     addAndMakeVisible(&distortionCoefficientLabel);
     distortionCoefficientSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBar);
     distortionCoefficientSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    distortionCoefficientSlider.setRange(1, 10, 0.001);
-    distortionCoefficientSlider.setValue(1);
+    coeffAttachment.reset(new juce::SliderParameterAttachment(*tree.getParameter("D"), distortionCoefficientSlider));
     addAndMakeVisible(&distortionCoefficientSlider);
-    distortionCoefficientSlider.onValueChange = [this] {
-        audioProcessor.setDistortionCoefficient(distortionCoefficientSlider.getValue());
-        graphing.setDistortionCoeff(distortionCoefficientSlider.getValue());
-    };
+
     zLabel.setJustificationType(juce::Justification::centredTop);
     zLabel.setText("Z", juce::dontSendNotification);
     addAndMakeVisible(&zLabel);
-    zSlider.setRange(0, 1, 0.001);
-    zSlider.setValue(0);
     zSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBar);
     zSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     addAndMakeVisible(&zSlider);
-    zSlider.onValueChange = [this] {
-        audioProcessor.setZ(zSlider.getValue());
-        graphing.setZ(zSlider.getValue());
-    };
+    zAttachment.reset(new juce::SliderParameterAttachment(*tree.getParameter("Z"), zSlider));
 }
 
-CommandLineDistortionAudioProcessorEditor::~CommandLineDistortionAudioProcessorEditor()
+TransferAudioProcessorEditor::~TransferAudioProcessorEditor()
 {
     setLookAndFeel(nullptr);
 }
 
+void TransferAudioProcessorEditor::onLabelButtonClicked(LabelButton* l)
+{
+    if (l == &graphButton)
+    {
+        graphing.setVisible(true);
+        gatePanel.setVisible(false);
+    }
+    else if(l == &gateButton){
+        graphing.setVisible(false);
+        gatePanel.setVisible(true);
+    }
+}
+
 //==============================================================================
-void CommandLineDistortionAudioProcessorEditor::paint (juce::Graphics& g)
+void TransferAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
 }
 
-void CommandLineDistortionAudioProcessorEditor::resized()
+void TransferAudioProcessorEditor::resized()
 {
     auto h = getHeight() / 10;
     expressionLabel.setBounds(0, 0, getWidth(), h);
     yLabel.setBounds(0, h, getWidth() / 24, h);
     expressionInput.setBounds(getWidth() / 24, h, getWidth(), h);
-    helpBlock.setBounds(0, h*2, getWidth()/2, getHeight() - h*3);
-    graphing.setBounds(getWidth() / 2, (h*2) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
+    helpBlock.setBounds(0, h*2, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
+    graphing.setBounds(getWidth() / 2 , (h*2) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
+    gatePanel.setBounds(getWidth() / 2, (h * 2) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
+    graphButton.setBounds(graphing.getX() - getWidth() / 10, graphing.getY(), getWidth() / 10 - 1, getHeight() / 15);
+    gateButton.setBounds(graphButton.getX(), graphButton.getY() + graphButton.getHeight() + 2, graphButton.getWidth(), graphButton.getHeight());
     distortionCoefficientLabel.setBounds(0, getHeight() - (h * 2), getWidth() / 4, h );
     distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 2), getWidth() - getWidth() / 4, h / 4);
     zLabel.setBounds(0, getHeight() - h, getWidth() / 4, h);

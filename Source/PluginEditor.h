@@ -12,28 +12,37 @@
 #include "PluginProcessor.h"
 #include "UI/LF.h"
 #include "UI/Graphing.h"
+#include "UI/GatePanel.h"
+#include "UI/LabelButton.h"
 //==============================================================================
 /**
 */
-class CommandLineDistortionAudioProcessorEditor  : public juce::AudioProcessorEditor
+class TransferAudioProcessorEditor  : public juce::AudioProcessorEditor, public LabelButton::Listener
 {
 public:
-    CommandLineDistortionAudioProcessorEditor (CommandLineDistortionAudioProcessor&);
-    ~CommandLineDistortionAudioProcessorEditor() override;
+    TransferAudioProcessorEditor (TransferAudioProcessor&, juce::AudioProcessorValueTreeState&);
+    ~TransferAudioProcessorEditor() override;
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    void onLabelButtonClicked(LabelButton* l) override;
+
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
+    juce::AudioProcessorValueTreeState& tree;
     juce::Label expressionLabel;
     juce::TextEditor expressionInput, yLabel;
     juce::TextEditor helpBlock;
+    
     juce::Label distortionCoefficientLabel, zLabel;
     juce::Slider distortionCoefficientSlider, zSlider;
-    CommandLineDistortionAudioProcessor& audioProcessor;
+    std::unique_ptr<juce::SliderParameterAttachment> coeffAttachment, zAttachment;
+    TransferAudioProcessor& audioProcessor;
     LF lookAndFeel;
     Graphing graphing;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CommandLineDistortionAudioProcessorEditor)
+    GatePanel gatePanel;
+    LabelButton graphButton, gateButton;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransferAudioProcessorEditor)
 };

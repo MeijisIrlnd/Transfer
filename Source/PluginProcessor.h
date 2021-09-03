@@ -14,17 +14,18 @@
 //==============================================================================
 /**
 */
-class CommandLineDistortionAudioProcessor  : public juce::AudioProcessor
+class TransferAudioProcessor  : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     //==============================================================================
-    CommandLineDistortionAudioProcessor();
-    ~CommandLineDistortionAudioProcessor() override;
+    TransferAudioProcessor();
+    ~TransferAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
+    void parameterChanged(const juce::String& id, float newValue) override;
    #ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
@@ -54,17 +55,18 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void setContext(const std::string& expression);
+    void setContext(const std::string expression);
     mathpresso::Expression* getMathExpr();
     void setDistortionCoefficient(double newCoefficient);
     void setZ(double newZ);
 private:
+    juce::AudioProcessorValueTreeState parameterTree;
     mathpresso::Context ctx;
     std::unique_ptr<Expression> context;
-    DSPCommon::KrunchProcessor<float> krunch;
+    KrunchProcessor<float> krunch;
     double currentCoefficient = 1;
     double currentZ = 0;
-    juce::AudioProcessorValueTreeState parameterTree;
+
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CommandLineDistortionAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransferAudioProcessor)
 };
