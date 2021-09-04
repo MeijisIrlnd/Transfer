@@ -127,7 +127,7 @@
         DSPCommon::Kalexpander<T> inputGate;
         bool gateState = true;
         juce::AudioProcessorValueTreeState& tree; 
-        std::function<float(float)> storedTransfer;
+        std::function<float(float)> storedTransfer = [this](T  x) { return x; };
         double storedCoefficient = 1;
         bool hasBeenPrepared = false;
     };

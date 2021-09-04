@@ -9,14 +9,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 // TODO: 
-// Come up with a catchier name
-// Load params on startup
-// Load last entered function on startup, and set it to be the transfer function, AND render the graph
-// Remember last selected panel (Graph or Gate)
-// Fix any crashes with user input functions not compiling 
 // Test on macOS
 // Test in DAW
-// 
 //==============================================================================
 TransferAudioProcessor::TransferAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -50,6 +44,7 @@ TransferAudioProcessor::TransferAudioProcessor()
     context.reset(new Expression(ctx, "y", 0, 0));
     parameterTree.addParameterListener("D", this);
     parameterTree.addParameterListener("Z", this);
+    krunch.setShapingFunction(DSPCommon::DSPShaping::FUNCTION::TANH);
 }
 
 TransferAudioProcessor::~TransferAudioProcessor()
@@ -185,10 +180,11 @@ juce::AudioProcessorEditor* TransferAudioProcessor::createEditor()
 void TransferAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     auto state = parameterTree.copyState();
-    if (!state.getChildWithName("Function").isValid()) {
-        juce::Identifier ident("Function");
+    if (!state.getChildWithName("Internal").isValid()) {
+        juce::Identifier ident("Internal");
         juce::ValueTree tree(ident);
         tree.setProperty("Function", juce::var("x"), nullptr);
+        tree.setProperty("Page", juce::var(0), nullptr);
         state.addChild(tree, -1, nullptr);
     }
     std::unique_ptr<juce::XmlElement> xmlState(state.createXml());
@@ -201,20 +197,20 @@ void TransferAudioProcessor::setStateInformation (const void* data, int sizeInBy
     if (xmlState.get() != nullptr) {
         if (xmlState->hasTagName(parameterTree.state.getType())) {
             auto currentTree = juce::ValueTree::fromXml(*xmlState);
-            if (!currentTree.getChildWithName("Function").isValid()) {
+            if (!currentTree.getChildWithName("Internal").isValid()) {
                 juce::Identifier ident("Function");
                 juce::ValueTree tree(ident);
                 tree.setProperty("Function", juce::var("x"), nullptr);
+                tree.setProperty("Page", juce::var(0), nullptr);
                 currentTree.addChild(tree, -1, nullptr);
             }
             parameterTree.replaceState(juce::ValueTree::fromXml(*xmlState));
         }
     }
-    std::string transferStr = parameterTree.state.getChildWithName("Function").getProperty("Function").toString().toStdString();
+    std::string transferStr = parameterTree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
     double d = parameterTree.state.getProperty("D");
     double z = parameterTree.state.getProperty("Z");
     setContext(transferStr);
-    //context->setExpr(transferStr, d, z);
 }
 
 //==============================================================================
@@ -226,14 +222,15 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 void TransferAudioProcessor::setContext(const std::string expr)
 {
-    if (parameterTree.state.getChildWithName("Function").isValid()) {
-        parameterTree.state.getChildWithName("Function").setProperty("Function", juce::var(expr), nullptr);
+    if (parameterTree.state.getChildWithName("Internal").isValid()) {
+        parameterTree.state.getChildWithName("Internal").setProperty("Function", juce::var(expr), nullptr);
     } 
     else {
-        juce::Identifier ident("Function");
+        juce::Identifier ident("Internal");
         juce::ValueTree tree(ident);
         parameterTree.state.addChild(tree, -1, nullptr);
-        parameterTree.state.getChildWithName("Function").setProperty("Function", juce::var(expr), nullptr);
+        parameterTree.state.getChildWithName("Internal").setProperty("Function", juce::var(expr), nullptr);
+
     }
     context->setExpr(expr);
     krunch.setShapingFunction(context->getTransferFunction());

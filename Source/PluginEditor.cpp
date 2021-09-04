@@ -22,7 +22,8 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
     expressionLabel.setText("Transfer Function:", juce::dontSendNotification);
     expressionInput.setFont(lookAndFeel.getFont());
-    std::string ipText = tree.state.getChildWithName("Function").getProperty("Function").toString().toStdString();
+    std::string ipText = tree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
+    if (ipText == "") { ipText = "x"; }
     expressionInput.setText(ipText, juce::dontSendNotification);
     graphing.updateExpr(expressionInput.getText().toStdString());
     auto dParam = tree.getParameter("D");
@@ -41,7 +42,16 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
 
     addAndMakeVisible(&yLabel);
     addAndMakeVisible(&gatePanel);
-    gatePanel.setVisible(false);
+    auto selectedPanel = tree.state.getChildWithName("Internal").getProperty("Page");
+    auto intPanel = (int)selectedPanel;
+    if (intPanel == 0) {
+        graphing.setVisible(true);
+        gatePanel.setVisible(false);
+    }
+    else {
+        graphing.setVisible(false);
+        gatePanel.setVisible(true);
+    }
     addAndMakeVisible(&graphButton);
     addAndMakeVisible(&gateButton);
 
@@ -98,10 +108,28 @@ void TransferAudioProcessorEditor::onLabelButtonClicked(LabelButton* l)
     {
         graphing.setVisible(true);
         gatePanel.setVisible(false);
+        if (!tree.state.getChildWithName("Internal").isValid()) {
+            juce::Identifier ident("Internal");
+            juce::ValueTree internalTree(ident);
+            tree.state.addChild(internalTree, -1, nullptr);
+            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(0), nullptr);
+        }
+        else {
+            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(0), nullptr);
+        }
     }
     else if(l == &gateButton){
         graphing.setVisible(false);
         gatePanel.setVisible(true);
+        if (!tree.state.getChildWithName("Internal").isValid()) {
+            juce::Identifier ident("Internal");
+            juce::ValueTree internalTree(ident);
+            tree.state.addChild(internalTree, -1, nullptr);
+            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(1), nullptr);
+        }
+        else {
+            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(1), nullptr);
+        }
     }
 }
 
