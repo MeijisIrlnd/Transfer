@@ -9,74 +9,48 @@
 */
 
 #pragma once
-#include <mathpresso.h>
+//#include <mathpresso.h>
+#include <atmsp.h>
 #include <string>
 #include <functional>
 
+template <typename T>
 struct Expression
 {
-    Expression(mathpresso::Context& c, std::string expr, float coeff, float cz) : ctx(c), distortionCoefficient(coeff), z(cz)
+    Expression<T>(std::string initialExpr, T coeff, T cz) : distortionCoefficient(coeff), z(cz)
     {
-        try {
-            ctx.addVariable("x", 0 * sizeof(double));
-            ctx.addVariable("d", 1 * sizeof(double));
-            ctx.addVariable("z", 2 * sizeof(double));
-            
-            mathpresso::Error err = exp.compile(ctx, expr.c_str(), mathpresso::kNoOptions);
-            if (err != mathpresso::kErrorOk) {
-                // Function should return x..
-                transferFunction = [this](float x) { 
-                    return x; 
-                };
-            }
-            else {
-                transferFunction = [this](float x) {
-                    double data[] = { x, distortionCoefficient, z };
-                    return exp.evaluate(data);
-                };
-            }
-        }
-        catch (std::exception& e) {
-            transferFunction = [this](float x) { 
-                return x; 
-            };
-        }
+        setExpr(initialExpr);
     }
 
-    std::function<float(float)>& getTransferFunction() { return transferFunction;  }
-
-    mathpresso::Expression* getExpr() { return &exp; }
-
-    void setExpr(std::string expr)
+    void setExpr(std::string newExpr)
     {
-        mathpresso::Error err = exp.compile(ctx, expr.c_str(), mathpresso::kNoOptions);
-        if (err != mathpresso::kErrorOk) {
-            // Function should return x..
-            transferFunction = [this](float x) {
-                return x;
-            };
+        size_t err = parser.parse(byteCode, newExpr, "x, d, z");
+        if (err) {
+            // y = x;
+            transferFunction = [this](float x) { return x; };
         }
         else {
             transferFunction = [this](float x) {
-                double data[] = { x, distortionCoefficient, z };
-                return exp.evaluate(data);
+                byteCode.var[0] = x;
+                byteCode.var[1] = distortionCoefficient;
+                byteCode.var[2] = z;
+                auto res = byteCode.run();
+                if (byteCode.fltErr) return x;
+                return res;
             };
         }
     }
 
-    void setDistortionCoefficient(float newDistortionCoefficient) {
-        distortionCoefficient = newDistortionCoefficient;
-    }
+    std::function<float(float)>& getTransferFunction() { return transferFunction; }
 
-    void setZ(float newZ) {
-        z = newZ;
-    }
+    void setDistortionCoefficient(T newCoeff) { distortionCoefficient = newCoeff; }
 
-private:
-    mathpresso::Context& ctx;
-    mathpresso::Expression exp;
+    void setZ(T newZ) { z = newZ; }
+
+private: 
+    ATMSP<T> parser;
+    ATMSB<T> byteCode;
+    T distortionCoefficient = 1;
+    T z = 0;
     std::function<float(float)> transferFunction;
-    juce::CriticalSection cs;
-    float distortionCoefficient = 1;
-    float z = 0;
 };

@@ -40,8 +40,7 @@ TransferAudioProcessor::TransferAudioProcessor()
          }), krunch(std::ref(parameterTree))
 #endif
 {
-    ctx.addBuiltIns();
-    context.reset(new Expression(ctx, "y", 0, 0));
+    context.reset(new Expression<float>("y", 0, 0));
     parameterTree.addParameterListener("D", this);
     parameterTree.addParameterListener("Z", this);
     krunch.setShapingFunction(DSPCommon::DSPShaping::FUNCTION::TANH);
@@ -234,16 +233,6 @@ void TransferAudioProcessor::setContext(const std::string expr)
     }
     context->setExpr(expr);
     krunch.setShapingFunction(context->getTransferFunction());
-}
-
-mathpresso::Expression* TransferAudioProcessor::getMathExpr()
-{
-    if (context != nullptr) {
-        return context->getExpr();
-    }
-    else {
-        return nullptr;
-    }
 }
 
 void TransferAudioProcessor::setDistortionCoefficient(double newCoefficient)

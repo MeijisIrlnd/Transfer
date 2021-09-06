@@ -56,13 +56,11 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     void setContext(const std::string expression);
-    mathpresso::Expression* getMathExpr();
     void setDistortionCoefficient(double newCoefficient);
     void setZ(double newZ);
 private:
     juce::AudioProcessorValueTreeState parameterTree;
-    mathpresso::Context ctx;
-    std::unique_ptr<Expression> context;
+    std::unique_ptr<Expression<float>> context;
     KrunchProcessor<float> krunch;
     double currentCoefficient = 1;
     double currentZ = 0;

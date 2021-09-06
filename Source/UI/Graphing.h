@@ -10,19 +10,15 @@
 
 #pragma once
 #include <JuceHeader.h>
-#include <mathpresso.h>
 #include <sstream>
 #include "LF.h"
+#include <atmsp.h>
+
 class Graphing : public juce::Component, juce::AudioProcessorValueTreeState::Listener
 {
 public:
     Graphing(juce::AudioProcessorValueTreeState& t)
     {
-        context.addBuiltIns();
-        context.addVariable("x", 0 * sizeof(double));
-        context.addVariable("d", 1 * sizeof(double));
-        context.addVariable("z", 2 * sizeof(double));
-
         setLookAndFeel(&lookAndFeel);
         dataset.reserve(100);
         t.addParameterListener("D", this);
@@ -88,12 +84,12 @@ public:
 
     void updateExpr(std::string newExpr)
     {
-        auto err = expr.compile(context, newExpr.c_str(), mathpresso::kNoOptions);
-        if (err == mathpresso::kErrorOk) {
-            hasTransfer = true;
+        auto err = parser.parse(byteCode, newExpr, "x,d,z");
+        if (err) { 
+            hasTransfer = false;
         }
         else {
-            hasTransfer = false;
+            hasTransfer = true;
         }
         recalculate();
     }
@@ -113,17 +109,15 @@ public:
     void recalculate()
     {
         dataset.clear();
-        if (expr.isCompiled()) {
-            double data[] = { 0, coeff, z };
-            //auto valueIncrement = 1 / (double)numPixels;
-            auto valueIncrement = 2 / (double)numPixels;
-            for (double i = -1; i <= 1; i += valueIncrement)
-            {
-                data[0] = i;
-                auto res = expr.evaluate(data);
-                if (std::isnan(res) || std::isinf(res)) dataset.push_back(0);
-                else dataset.push_back((res));
-            }
+        byteCode.var[0] = 0;
+        byteCode.var[1] = coeff;
+        byteCode.var[2] = z;
+        auto valIncrement = 2 / (double)numPixels;
+        for (double i = -1; i <= 1; i += valIncrement) {
+            byteCode.var[0] = i;
+            auto res = byteCode.run();
+            if (byteCode.fltErr) dataset.push_back(0);
+            else dataset.push_back(res);
         }
         repaint();
     }
@@ -148,8 +142,8 @@ private:
     bool hasTransfer = false;
     double z = 0;
     double coeff = 1;
-    mathpresso::Context context;
-    mathpresso::Expression expr;
+    ATMSP<float> parser;
+    ATMSB<float> byteCode;
     std::vector<float> dataset;
 
 };
