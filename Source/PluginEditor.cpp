@@ -16,7 +16,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (800, 600);
+    setSize (800, 900);
     setLookAndFeel(&lookAndFeel);
     addAndMakeVisible(&graphing);
     expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
@@ -64,6 +64,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     helpBlock.setColour(juce::TextEditor::textColourId, juce::Colour(100, 100, 100));
     expressionInput.onReturnKey = [this] {
         try {
+#ifndef USE_EXPRTK
             auto text = expressionInput.getText();
             if (!text.contains("atan2")) {
                 audioProcessor.setContext(expressionInput.getText().toStdString());
@@ -73,8 +74,10 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
                 audioProcessor.setContext("x");
                 graphing.updateExpr("x");
             }
-
-            
+#else 
+            audioProcessor.setContext(expressionInput.getText().toStdString());
+            graphing.updateExpr(expressionInput.getText().toStdString());
+#endif
         }
         catch(std::exception& e){
             //Don't
@@ -86,6 +89,20 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     //helpBlock.setText(
     //    "Variables:\nx = Input Sample\nd = Distortion Coefficient\nz = User Defined, 0 to 1\nE = 2.7182818284590452354\nPI = 3.14159265358979323846\n\nFunctions:\nsin(x), cos(x), tan(x)\nasin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x)\npow(x, y), sqrt(x)\nlog(x), log2(x), log10(x)\nfrac(x), recip(x)\nmin(x,y), max(x,y)\navg(x,y), ceil(x), floor(x)\nround(x), roundeven(x), trunc(x)\nsignbit(x), copysign(x,y)\n\nOperators:\n+, -, *, /, %\n!(x), -(x)\n", false
     //);
+#if defined USE_EXPRTK
+    std::stringstream displayText;
+    displayText << "Variables:\nx = Input Sample\nd = Distortion coefficient\nz = User defined (0 to 1)\n\n";
+    displayText << "Logical:\nand, nand, mand, &, nor, xor, |, nor, xnor, not, \n\n";
+    displayText << "General:\nabs(x), avg(x,y..), ceil(x), clamp(mn,x,mx), equal(x,y), erf(x), erfc(x), exp(x), expm1(x), floor(x), frac(x), hypot(x,y), iclamp(mn,x,mx),";
+    displayText << "inrange(mn,x,mx), log(x), log10(x), log1p(x), log2(x), logn(x,n), max(x,y..), min(x,y..), mul(x,y..), ncdf(x), not_equal(x,y), pow(x,y), root(x,n),";
+    displayText << "round(x), roundn(x,n), sgn(x), sqrt(x), sum(x,y..), swap(x,y), trunc(x)\n\n";
+    displayText << "Trig:\nsin(x), cos(x), tan(x), asin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x), asinh(x), acosh(x), atanh(x), atan2(x,y), sinc(x), sec(x), cot(x), csc(x), deg2rad(x),";
+    displayText << "deg2grad(x), rad2deg(x), grad2deg(x)\n\n";
+    displayText << "Equalities & Operators:\n +, -, *, /, %, ^\n==, !=, <, <=, >, >=";
+
+    helpBlock.setText(displayText.str(), false);
+#else 
+
     helpBlock.setText(
         juce::String("Variables:\n") +
         juce::String("x = Input Sample\n") +
@@ -105,6 +122,8 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
         juce::String("sig(x)\n\n") +
         juce::String("Operators: \n") +
         juce::String("+, -, *, /, ^"), false);
+#endif
+
     helpBlock.setReadOnly(true);
     addAndMakeVisible(&helpBlock);
     distortionCoefficientLabel.setJustificationType(juce::Justification::centredTop);

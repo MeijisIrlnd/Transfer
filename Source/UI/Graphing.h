@@ -13,16 +13,34 @@
 #include <sstream>
 #include "LF.h"
 #include <atmsp.h>
+#include <exprtk.hpp>
 
+#if defined USE_EXPRTK
+template <typename T>
+#endif
 class Graphing : public juce::Component, juce::AudioProcessorValueTreeState::Listener, public juce::Timer 
 {
 public:
+#if defined USE_EXPRTK
+    Graphing<T>(juce::AudioProcessorValueTreeState& t)
+#else 
     Graphing(juce::AudioProcessorValueTreeState& t)
+#endif
     {
         setLookAndFeel(&lookAndFeel);
         dataset.reserve(100);
         t.addParameterListener("D", this);
         t.addParameterListener("Z", this);
+#if defined USE_EXPRTK
+        symbolTable.add_variable("x", currentIp);
+        symbolTable.add_variable("d", coeff);
+        symbolTable.add_variable("z", z);
+        symbolTable.add_variable("prev", previous);
+        
+        symbolTable.add_constants();
+        expression.register_symbol_table(symbolTable);
+        parser.settings().disable_all_control_structures();
+#endif
         startTimer(16.7);
     }
 
@@ -92,15 +110,19 @@ public:
 
     void updateExpr(std::string newExpr)
     {
+#if defined USE_EXPRTK
+        if (parser.compile(newExpr, expression)) { hasTransfer = true; }
+        else { hasTransfer = false; }
+#else 
         auto err = parser.parse(byteCode, newExpr, "x,d,z");
-        if (err) { 
+        if (err) {
             hasTransfer = false;
         }
         else {
             hasTransfer = true;
         }
+#endif
         repaintRequested.store(true);
-        //recalculate();
     }
 
     void setDistortionCoeff(double newCoeff)
@@ -118,16 +140,33 @@ public:
     void recalculate()
     {
         dataset.clear();
+        auto valIncrement = 2 / (double)numPixels;
+#if defined USE_EXPRTK
+        for (double i = -1; i <= 1; i += valIncrement) {
+            currentIp = i;
+            try {
+                auto res = expression.value();
+                previous = res == std::isnan(res) ? 0 : res;
+                if (std::isnan(res) || std::isinf(res)) dataset.push_back(0);
+                else dataset.push_back(res);
+
+            }
+            catch (std::exception& e) {
+                dataset.push_back(0);
+            }
+        }
+#else 
         byteCode.var[0] = 0;
         byteCode.var[1] = coeff;
         byteCode.var[2] = z;
-        auto valIncrement = 2 / (double)numPixels;
+
         for (double i = -1; i <= 1; i += valIncrement) {
             byteCode.var[0] = i;
             auto res = byteCode.run();
             if (std::isnan(res) || std::isinf(res)) dataset.push_back(0);
             else dataset.push_back(res);
         }
+#endif
         repaintRequested.store(false);
         repaint();
     }
@@ -150,10 +189,22 @@ private:
     GLF lookAndFeel;
     int numPixels;
     bool hasTransfer = false;
-    double z = 0;
-    double coeff = 1;
+
+#if defined USE_EXPRTK
+    exprtk::symbol_table<T> symbolTable;
+    exprtk::expression<T> expression;
+    exprtk::parser<T> parser;
+    T z = 0;
+    T coeff = 1;
+    T currentIp = 0;
+    T previous = 0;
+#else 
     ATMSP<float> parser;
     ATMSB<float> byteCode;
+    double z = 0;
+    double coeff = 1;
+#endif
+
     std::vector<float> dataset;
     std::atomic_bool repaintRequested{ true };
 
