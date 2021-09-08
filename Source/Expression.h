@@ -43,7 +43,10 @@ struct Expression
 
     std::function<float(float)>& getTransferFunction() { return transferFunction; }
 
-    void setDistortionCoefficient(T newCoeff) { distortionCoefficient = newCoeff; }
+    void setDistortionCoefficient(T newCoeff) { 
+        distortionCoefficient = newCoeff;
+    
+    }
 
     void setZ(T newZ) { z = newZ; }
 

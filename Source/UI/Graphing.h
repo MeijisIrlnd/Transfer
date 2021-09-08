@@ -14,7 +14,7 @@
 #include "LF.h"
 #include <atmsp.h>
 
-class Graphing : public juce::Component, juce::AudioProcessorValueTreeState::Listener
+class Graphing : public juce::Component, juce::AudioProcessorValueTreeState::Listener, public juce::Timer 
 {
 public:
     Graphing(juce::AudioProcessorValueTreeState& t)
@@ -23,6 +23,7 @@ public:
         dataset.reserve(100);
         t.addParameterListener("D", this);
         t.addParameterListener("Z", this);
+        startTimer(16.7);
     }
 
     ~Graphing() override
@@ -36,6 +37,13 @@ public:
         else if (id == "Z") setZ(newValue);
     }
 
+    void timerCallback() override
+    {
+        if (repaintRequested.load()) {
+            recalculate();
+        }
+    }
+
     void paint(juce::Graphics& g) override
     {
         try {
@@ -45,7 +53,7 @@ public:
             float posIncrement = frame.getWidth() / (double)numPixels;
             juce::Path p;
             auto pos = frame.getX();
-            if (hasTransfer) {
+            if (hasTransfer && dataset.size() != 0) {
                 if (!std::isnan(dataset[0]))
                 {
                     auto mappedStartY = juce::jmap<double>(dataset[0], -1, 1, 0, 1);
@@ -91,19 +99,20 @@ public:
         else {
             hasTransfer = true;
         }
-        recalculate();
+        repaintRequested.store(true);
+        //recalculate();
     }
 
     void setDistortionCoeff(double newCoeff)
     {
         coeff = newCoeff;
-        recalculate();
+        repaintRequested.store(true);
     }
 
     void setZ(double newZ)
     {
         z = newZ;
-        recalculate();
+        repaintRequested.store(true);
     }
 
     void recalculate()
@@ -116,9 +125,10 @@ public:
         for (double i = -1; i <= 1; i += valIncrement) {
             byteCode.var[0] = i;
             auto res = byteCode.run();
-            if (byteCode.fltErr) dataset.push_back(0);
+            if (std::isnan(res) || std::isinf(res)) dataset.push_back(0);
             else dataset.push_back(res);
         }
+        repaintRequested.store(false);
         repaint();
     }
 
@@ -145,5 +155,6 @@ private:
     ATMSP<float> parser;
     ATMSB<float> byteCode;
     std::vector<float> dataset;
+    std::atomic_bool repaintRequested{ true };
 
 };

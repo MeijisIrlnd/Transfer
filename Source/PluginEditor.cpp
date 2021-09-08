@@ -64,8 +64,16 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     helpBlock.setColour(juce::TextEditor::textColourId, juce::Colour(100, 100, 100));
     expressionInput.onReturnKey = [this] {
         try {
-            audioProcessor.setContext(expressionInput.getText().toStdString());
-            graphing.updateExpr(expressionInput.getText().toStdString());
+            auto text = expressionInput.getText();
+            if (!text.contains("atan2")) {
+                audioProcessor.setContext(expressionInput.getText().toStdString());
+                graphing.updateExpr(expressionInput.getText().toStdString());
+            }
+            else {
+                audioProcessor.setContext("x");
+                graphing.updateExpr("x");
+            }
+
             
         }
         catch(std::exception& e){
@@ -75,9 +83,28 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     addAndMakeVisible(&expressionInput);
     helpBlock.setMultiLine(true);
     //atan(x*d) * 1/z
+    //helpBlock.setText(
+    //    "Variables:\nx = Input Sample\nd = Distortion Coefficient\nz = User Defined, 0 to 1\nE = 2.7182818284590452354\nPI = 3.14159265358979323846\n\nFunctions:\nsin(x), cos(x), tan(x)\nasin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x)\npow(x, y), sqrt(x)\nlog(x), log2(x), log10(x)\nfrac(x), recip(x)\nmin(x,y), max(x,y)\navg(x,y), ceil(x), floor(x)\nround(x), roundeven(x), trunc(x)\nsignbit(x), copysign(x,y)\n\nOperators:\n+, -, *, /, %\n!(x), -(x)\n", false
+    //);
     helpBlock.setText(
-        "Variables:\nx = Input Sample\nd = Distortion Coefficient\nz = User Defined, 0 to 1\nE = 2.7182818284590452354\nPI = 3.14159265358979323846\n\nFunctions:\nsin(x), cos(x), tan(x)\nasin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x)\npow(x, y), sqrt(x)\nlog(x), log2(x), log10(x)\nfrac(x), recip(x)\nmin(x,y), max(x,y)\navg(x,y), ceil(x), floor(x)\nround(x), roundeven(x), trunc(x)\nsignbit(x), copysign(x,y)\n\nOperators:\n+, -, *, /, %\n!(x), -(x)\n", false
-    );
+        juce::String("Variables:\n") +
+        juce::String("x = Input Sample\n") +
+        juce::String("d = Distortion Coefficient (1 to 10)\n") +
+        juce::String("z = User defined (0 to 1)\n") +
+        juce::String("$e = Euler's Number (2.7182818284590452354)\n") +
+        juce::String("$pi = PI(3.14159265358979323846)\n\n") +
+        juce::String("Functions: \n") +
+        juce::String("abs(x),\n") +
+        juce::String("sin(x), cos(x), tan(x),\n") +
+        juce::String("sinh(x), cosh(x), tanh(x),\n") +
+        juce::String("asin(x), acos(x), atan(x),\n") +
+        juce::String("exp(x),\n") +
+        juce::String("log(x), log2(x), log10(x),\n") +
+        juce::String("sqrt(x),\n") +
+        juce::String("floor(x, y), round(x), min(x, y), max(x, y),\n") +
+        juce::String("sig(x)\n\n") +
+        juce::String("Operators: \n") +
+        juce::String("+, -, *, /, ^"), false);
     helpBlock.setReadOnly(true);
     addAndMakeVisible(&helpBlock);
     distortionCoefficientLabel.setJustificationType(juce::Justification::centredTop);
