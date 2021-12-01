@@ -79,6 +79,9 @@ public:
                     for (auto i = 1; i < numPixels; i++)
                     {
                         pos += posIncrement;
+                        if (std::isnan(dataset[i]) || std::isinf(dataset[i])) {
+                            dataset[i] = 0;
+                        }
                         auto mappedY = juce::jmap<double>(dataset[i], -1, 1, 0, 1);
                         mappedY = std::isnan(mappedY) || std::isinf(mappedY) ? 0 : mappedY;
                         p.lineTo(pos, frame.getBottom() - frame.getHeight() * mappedY);
@@ -100,10 +103,16 @@ public:
                     p.lineTo(pos, frame.getBottom() - frame.getHeight() * i / (double)numPixels);
                 }
             }
-            g.setColour(juce::Colours::black);
-            g.strokePath(p, juce::PathStrokeType(1.0));
-            g.setColour(juce::Colour(100, 100, 100));
-            g.drawRect(frame, 1.0);
+            try {
+                g.setColour(juce::Colours::black);
+                p.scaleToFit(0, 0, getWidth(), getHeight(), true);
+                g.strokePath(p, juce::PathStrokeType(1.0));
+                g.setColour(juce::Colour(100, 100, 100));
+                g.drawRect(frame, 1.0);
+            }
+            catch (std::exception& e) {
+
+            }
         }
         catch (std::exception& e) {}
     }
@@ -147,8 +156,14 @@ public:
             try {
                 auto res = expression.value();
                 previous = res == std::isnan(res) ? 0 : res;
-                if (std::isnan(res) || std::isinf(res)) dataset.push_back(0);
-                else dataset.push_back(res);
+                if (std::isnan(res) || std::isinf(res)) {
+                    DBG("HERE");
+                }
+                {
+                    std::lock_guard<std::mutex> lock(m_mutex);
+                    if (std::isnan(res) || std::isinf(res)) dataset.push_back(0);
+                    else dataset.push_back(res);
+                }
 
             }
             catch (std::exception& e) {
@@ -205,6 +220,7 @@ private:
     double coeff = 1;
 #endif
 
+    std::mutex m_mutex;
     std::vector<float> dataset;
     std::atomic_bool repaintRequested{ true };
 

@@ -37,13 +37,20 @@ struct Expression
 
 
 #ifdef USE_EXPRTK
+        std::lock_guard<std::mutex> m_lock(m_mutex);
         if (parser.compile(newExpr, expression)) {
             transferFunction = [this](float x) {
-                currentIp = x;
-                auto res = expression.value();
-                res = std::isnan(res) ? 0 : res;
-                previous = x;
-                return res;
+                try {
+                    std::lock_guard<std::mutex> m_lock(m_mutex);
+                    currentIp = x;
+                    auto res = expression.value();
+                    res = std::isnan(res) ? 0 : res;
+                    previous = x;
+                    return res;
+                }
+                catch (std::exception& e) {
+                    return 0.0f;
+                }
             };
         }
         else {
@@ -92,4 +99,5 @@ private:
     T z = 0;
     T previous = 0;
     std::function<float(float)> transferFunction;
+    std::mutex m_mutex;
 };
