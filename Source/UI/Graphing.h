@@ -157,7 +157,7 @@ public:
                 auto res = expression.value();
                 previous = res == std::isnan(res) ? 0 : res;
                 if (std::isnan(res) || std::isinf(res)) {
-                    throw;
+                    throw std::exception();
                 }
                 {
                     std::lock_guard<std::mutex> lock(m_mutex);
