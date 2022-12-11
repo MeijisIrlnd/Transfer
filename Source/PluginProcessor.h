@@ -10,7 +10,7 @@
 
 #include <JuceHeader.h>
 #include "Expression.h"
-#include "KrunchProcessor.h"
+#include <Audio/Distortion.h>
 //==============================================================================
 /**
 */
@@ -59,9 +59,10 @@ public:
     void setDistortionCoefficient(double newCoefficient);
     void setZ(double newZ);
 private:
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout() noexcept;
     juce::AudioProcessorValueTreeState parameterTree;
     std::unique_ptr<Expression<float>> context;
-    KrunchProcessor<float> krunch;
+    Transfer::Audio::Distortion m_distortion;
     double currentCoefficient = 1;
     double currentZ = 0;
 

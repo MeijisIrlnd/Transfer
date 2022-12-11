@@ -21,29 +21,15 @@ TransferAudioProcessor::TransferAudioProcessor()
 #endif
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-    ), parameterTree(*this, nullptr, juce::Identifier("CMDistortion"), {
-        std::make_unique<juce::AudioParameterFloat>("D", "D", juce::NormalisableRange<float>(0, 10, 0.001), 1),
-        std::make_unique<juce::AudioParameterFloat>("Z", "Z", 0, 1, 0),
-         std::make_unique<juce::AudioParameterFloat>("Threshold", "Threshold", -100, 0, -10),
-         std::make_unique<juce::AudioParameterFloat>("Ratio", "Ratio", 1.5, 20, 2),
-         std::make_unique<juce::AudioParameterFloat>("Attack", "Attack", juce::NormalisableRange<float>(1e-5f, 0.5f, 1e-5f), 1e-5f),
-         std::make_unique<juce::AudioParameterFloat>("Release", "Release", juce::NormalisableRange<float>(1e-5f, 0.5f, 1e-5f), 1e-5f)
-        }), krunch(std::ref(parameterTree))
+    ), 
 #else 
-    : parameterTree(*this, nullptr, juce::Identifier("CMDistortion"), {
-         std::make_unique<juce::AudioParameterFloat>("D", "D", juce::NormalisableRange<float>(0, 10, 0.001), 1),
-         std::make_unique<juce::AudioParameterFloat>("Z", "Z", 0, 1, 0) ,
-         std::make_unique<juce::AudioParameterFloat>("Threshold", "Threshold", -100, 0, -10),
-         std::make_unique<juce::AudioParameterFloat>("Ratio", "Ratio", 1.5f, 20, 2),
-         std::make_unique<juce::AudioParameterFloat>("Attack", "Attack", juce::NormalisableRange<float>(1e-5f, 0.5f, 1e-5f), 1e-5f),
-         std::make_unique<juce::AudioParameterFloat>("Release", "Release", juce::NormalisableRange<float>(1e-5f, 0.5f, 1e-5f), 1e-5f)
-         }), krunch(std::ref(parameterTree))
+    : 
 #endif
+    parameterTree(*this, nullptr, juce::Identifier("CMDistortion"), createParameterLayout()), m_distortion(parameterTree)
 {
     context.reset(new Expression<float>("y", 0, 0));
     parameterTree.addParameterListener("D", this);
     parameterTree.addParameterListener("Z", this);
-    krunch.setShapingFunction(DSPCommon::DSPShaping::FUNCTION::TANH);
 }
 
 TransferAudioProcessor::~TransferAudioProcessor()
@@ -121,12 +107,12 @@ void TransferAudioProcessor::changeProgramName (int index, const juce::String& n
 //==============================================================================
 void TransferAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    krunch.prepare(samplesPerBlock, sampleRate);
+    m_distortion.prepareToPlay(samplesPerBlock, sampleRate);
 }
 
 void TransferAudioProcessor::releaseResources()
 {
-    krunch.release();
+    m_distortion.releaseResources();
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -160,8 +146,7 @@ void TransferAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-    juce::AudioSourceChannelInfo bufferToFill(buffer);
-    krunch.getNextAudioBlock(bufferToFill);
+    m_distortion.getNextAudioBlock(juce::AudioSourceChannelInfo{ buffer });
 }
 
 //==============================================================================
@@ -232,13 +217,12 @@ void TransferAudioProcessor::setContext(const std::string expr)
 
     }
     context->setExpr(expr);
-    krunch.setShapingFunction(context->getTransferFunction());
+    m_distortion.setShapingFunction(context->getTransferFunction());
 }
 
 void TransferAudioProcessor::setDistortionCoefficient(double newCoefficient)
 {
     currentCoefficient = newCoefficient;
-
     if(context != nullptr) context->setDistortionCoefficient(newCoefficient);
 }
 
@@ -246,4 +230,22 @@ void TransferAudioProcessor::setZ(double newZ)
 {
     currentZ = newZ;
     if (context != nullptr) context->setZ(newZ);
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout TransferAudioProcessor::createParameterLayout() noexcept
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    using FloatParam = juce::AudioParameterFloat;
+    using ChoiceParam = juce::AudioParameterChoice;
+    layout.add(std::make_unique<FloatParam>("D", "D", juce::NormalisableRange<float>(0, 10, 0.001), 0));
+    layout.add(std::make_unique<FloatParam>("Z", "Z", juce::NormalisableRange<float>(0, 1, 0.001), 0));
+    layout.add(std::make_unique<FloatParam>("Threshold", "Threshold", -100, 0, -10));
+    layout.add(std::make_unique<FloatParam>("Ratio", "Ratio", 1.5f, 20, 2));
+    layout.add(std::make_unique<FloatParam>("Attack", "Attack", juce::NormalisableRange<float>(1e-5f, 0.5f, 1e-5f), 1e-5f));
+    layout.add(std::make_unique<FloatParam>("Release", "Release", juce::NormalisableRange<float>(1e-5f, 0.5f, 1e-5f), 1e-5f));
+    layout.add(std::make_unique<ChoiceParam>("EmphasisFilterType", "EmphasisFilterType", juce::StringArray("Low Shelf", "High Shelf"), 0));
+    layout.add(std::make_unique<FloatParam>("EmphasisFilterCutoff", "EmphasisFilterCutoff", juce::NormalisableRange<float>(20, 20000, 0.01f, 0.5f), 1000));
+    layout.add(std::make_unique<FloatParam>("EmphasisFilterSlope", "EmphasisFilterSlope", juce::NormalisableRange<float>(0.01f, 1, 0.01f), 0.5f));
+    layout.add(std::make_unique<FloatParam>("EmphasisFilterGain", "EmphasisFilterGain", juce::NormalisableRange<float>(-12, 12, 0.01f), 0.0f));
+    return layout;
 }

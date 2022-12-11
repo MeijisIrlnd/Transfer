@@ -14,6 +14,7 @@
 #include "UI/Graphing.h"
 #include "UI/GatePanel.h"
 #include "UI/LabelButton.h"
+#include <UI/FilterPanel.h>
 //==============================================================================
 /**
 */
@@ -41,8 +42,13 @@ private:
     std::unique_ptr<juce::SliderParameterAttachment> coeffAttachment, zAttachment;
     TransferAudioProcessor& audioProcessor;
     LF lookAndFeel;
+#if defined USE_EXPRTK
+    Graphing<double> graphing;
+#else
     Graphing graphing;
+#endif
     GatePanel gatePanel;
-    LabelButton graphButton, gateButton;
+    Transfer::UI::FilterPanel filterPanel;
+    LabelButton filterButton, graphButton, gateButton;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransferAudioProcessorEditor)
 };
