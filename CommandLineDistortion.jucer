@@ -2,10 +2,11 @@
 
 <JUCERPROJECT id="evfaQW" name="Transfer" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              pluginChannelConfigs="{2, 2}" pluginName="Transfer" pluginManufacturer="Syl Morrison"
+              pluginChannelConfigs="{1, 1}, {2, 2}" pluginName="Transfer" pluginManufacturer="Syl Morrison"
               pluginDesc="KCU001" companyName="Syl Morrison" companyCopyright="KCU"
               companyWebsite="https://kalidemusic.com" cppLanguageStandard="20"
-              pluginCharacteristicsValue="pluginEditorRequiresKeys">
+              pluginCharacteristicsValue="pluginEditorRequiresKeys" pluginAUMainType="'aufx'"
+              pluginAUIsSandboxSafe="1">
   <MAINGROUP id="q5aHrr" name="Transfer">
     <GROUP id="{E1BD8A85-B738-0C04-A90A-6AD1615459FF}" name="Resources">
       <FILE id="fPRxmI" name="DroidSansMono.ttf" compile="0" resource="1"

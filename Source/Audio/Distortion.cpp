@@ -34,6 +34,7 @@ namespace Transfer::Audio
             m_backwardEmphasisFilters[i].prepareToPlay(samplesPerBlockExpected, sampleRate);
             m_gates[i].prepareToPlay(samplesPerBlockExpected, sampleRate);
         }
+        m_prepared = true;
     }
 
     void Distortion::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)

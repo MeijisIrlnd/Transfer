@@ -14,6 +14,7 @@
 #include "LF.h"
 #include <atmsp.h>
 #include <exprtk.hpp>
+#include <SDSP/SDSP.h>
 
 #if defined USE_EXPRTK
 template <typename T>
@@ -22,10 +23,11 @@ class Graphing : public juce::Component, juce::AudioProcessorValueTreeState::Lis
 {
 public:
 #if defined USE_EXPRTK
-    Graphing<T>(juce::AudioProcessorValueTreeState& t)
+    Graphing<T>(juce::AudioProcessorValueTreeState& t) :
 #else 
-    Graphing(juce::AudioProcessorValueTreeState& t)
+    Graphing(juce::AudioProcessorValueTreeState& t) :
 #endif
+    m_tree(t)
     {
         setLookAndFeel(&lookAndFeel);
         dataset.reserve(100);
@@ -47,6 +49,8 @@ public:
     ~Graphing() override
     {
         setLookAndFeel(nullptr);
+        m_tree.removeParameterListener("D", this);
+        m_tree.removeParameterListener("Z", this);
     }
 
     void parameterChanged(const juce::String& id, float newValue) override
@@ -201,6 +205,7 @@ private:
             setColour(juce::Label::textColourId, juce::Colour(100, 100, 100));
         }
     };
+    APVTS& m_tree;
     GLF lookAndFeel;
     int numPixels;
     bool hasTransfer = false;

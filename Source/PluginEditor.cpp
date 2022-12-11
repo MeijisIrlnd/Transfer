@@ -160,6 +160,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     zSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     addAndMakeVisible(&zSlider);
     zAttachment.reset(new juce::SliderParameterAttachment(*tree.getParameter("Z"), zSlider));
+    setWantsKeyboardFocus(true);
 }
 
 TransferAudioProcessorEditor::~TransferAudioProcessorEditor()
