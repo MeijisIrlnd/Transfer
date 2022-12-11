@@ -5,6 +5,12 @@
     <Filter Include="Transfer\Resources">
       <UniqueIdentifier>{9DA0AE48-6C4F-A6D9-C500-E592430C4E90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Transfer\Source\Types">
+      <UniqueIdentifier>{7B096620-D688-EA47-A377-B41ED343C794}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Transfer\Source\Audio">
+      <UniqueIdentifier>{1173E0E4-84E0-1F57-BCAB-CC2D1B65CD0C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Transfer\Source\UI">
       <UniqueIdentifier>{F58FEEF9-DF09-FFC2-8077-5F2D83E15EE8}</UniqueIdentifier>
     </Filter>
@@ -475,6 +481,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Audio\Distortion.cpp">
+      <Filter>Transfer\Source\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Audio\Gate.cpp">
+      <Filter>Transfer\Source\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Audio\PreEmphasisFilter.cpp">
+      <Filter>Transfer\Source\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\UI\FilterPanel.cpp">
+      <Filter>Transfer\Source\UI</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp">
       <Filter>Transfer\Source</Filter>
     </ClCompile>
@@ -1591,6 +1609,9 @@
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_data_structures\values\juce_ValueTree.cpp">
       <Filter>JUCE Modules\juce_data_structures\values</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_data_structures\values\juce_ValueTreePropertyWithDefault_test.cpp">
+      <Filter>JUCE Modules\juce_data_structures\values</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_data_structures\values\juce_ValueTreeSynchroniser.cpp">
       <Filter>JUCE Modules\juce_data_structures\values</Filter>
     </ClCompile>
@@ -1838,6 +1859,9 @@
       <Filter>JUCE Modules\juce_graphics\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_graphics\geometry\juce_PathStrokeType.cpp">
+      <Filter>JUCE Modules\juce_graphics\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_graphics\geometry\juce_Rectangle_test.cpp">
       <Filter>JUCE Modules\juce_graphics\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_graphics\image_formats\jpglib\jcapimin.c">
@@ -2697,8 +2721,20 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\KalexpanderProcessor.h">
-      <Filter>Transfer\Source</Filter>
+    <ClInclude Include="..\..\Source\Types\FilterType.h">
+      <Filter>Transfer\Source\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Audio\Distortion.h">
+      <Filter>Transfer\Source\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Audio\Gate.h">
+      <Filter>Transfer\Source\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Audio\PreEmphasisFilter.h">
+      <Filter>Transfer\Source\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\UI\FilterPanel.h">
+      <Filter>Transfer\Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\UI\GatePanel.h">
       <Filter>Transfer\Source\UI</Filter>
@@ -2713,9 +2749,6 @@
       <Filter>Transfer\Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Expression.h">
-      <Filter>Transfer\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\KrunchProcessor.h">
       <Filter>Transfer\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PluginProcessor.h">
@@ -3714,6 +3747,9 @@
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_audio_processors\processors\juce_GenericAudioProcessorEditor.h">
       <Filter>JUCE Modules\juce_audio_processors\processors</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_audio_processors\processors\juce_HostedAudioProcessorParameter.h">
+      <Filter>JUCE Modules\juce_audio_processors\processors</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_audio_processors\processors\juce_PluginDescription.h">
       <Filter>JUCE Modules\juce_audio_processors\processors</Filter>
     </ClInclude>
@@ -3846,6 +3882,9 @@
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_core\containers\juce_ScopedValueSetter.h">
       <Filter>JUCE Modules\juce_core\containers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_core\containers\juce_SingleThreadedAbstractFifo.h">
+      <Filter>JUCE Modules\juce_core\containers</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_core\containers\juce_SortedSet.h">
       <Filter>JUCE Modules\juce_core\containers</Filter>
     </ClInclude>
@@ -3949,6 +3988,9 @@
       <Filter>JUCE Modules\juce_core\memory</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_core\memory\juce_ReferenceCountedObject.h">
+      <Filter>JUCE Modules\juce_core\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_core\memory\juce_Reservoir.h">
       <Filter>JUCE Modules\juce_core\memory</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_core\memory\juce_ScopedPointer.h">
@@ -4246,6 +4288,9 @@
       <Filter>JUCE Modules\juce_data_structures\values</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_data_structures\values\juce_ValueTree.h">
+      <Filter>JUCE Modules\juce_data_structures\values</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_data_structures\values\juce_ValueTreePropertyWithDefault.h">
       <Filter>JUCE Modules\juce_data_structures\values</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_data_structures\values\juce_ValueTreeSynchroniser.h">
@@ -4630,6 +4675,9 @@
       <Filter>JUCE Modules\juce_graphics\images</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_graphics\images\juce_ImageFileFormat.h">
+      <Filter>JUCE Modules\juce_graphics\images</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_graphics\images\juce_ScaledImage.h">
       <Filter>JUCE Modules\juce_graphics\images</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_graphics\native\juce_mac_CoreGraphicsContext.h">
@@ -5038,6 +5086,9 @@
       <Filter>JUCE Modules\juce_gui_basics\native\x11</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_gui_basics\native\juce_MultiTouchMapper.h">
+      <Filter>JUCE Modules\juce_gui_basics\native</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_gui_basics\native\juce_ScopedDPIAwarenessDisabler.h">
       <Filter>JUCE Modules\juce_gui_basics\native</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_gui_basics\native\juce_win32_ScopedThreadDPIAwarenessSetter.h">

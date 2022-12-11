@@ -44,7 +44,7 @@ struct Expression
                     std::lock_guard<std::mutex> m_lock(m_mutex);
                     currentIp = x;
                     auto res = expression.value();
-                    res = std::isnan(res) ? 0 : res;
+                    res = std::isnan(res) || std::isinf(res) ? 0 : res;
                     previous = x;
                     return res;
                 }
@@ -79,7 +79,6 @@ struct Expression
 
     void setDistortionCoefficient(T newCoeff) { 
         distortionCoefficient = newCoeff;
-    
     }
 
     void setZ(T newZ) { z = newZ; }

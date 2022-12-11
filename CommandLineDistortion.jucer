@@ -2,24 +2,38 @@
 
 <JUCERPROJECT id="evfaQW" name="Transfer" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              pluginChannelConfigs="{1, 1}, {2, 2}">
+              pluginChannelConfigs="{2, 2}" pluginName="Transfer" pluginManufacturer="Syl Morrison"
+              pluginDesc="KCU001" companyName="Syl Morrison" companyCopyright="KCU"
+              companyWebsite="https://kalidemusic.com" cppLanguageStandard="20"
+              pluginCharacteristicsValue="pluginEditorRequiresKeys">
   <MAINGROUP id="q5aHrr" name="Transfer">
     <GROUP id="{E1BD8A85-B738-0C04-A90A-6AD1615459FF}" name="Resources">
       <FILE id="fPRxmI" name="DroidSansMono.ttf" compile="0" resource="1"
             file="Resources/DroidSansMono.ttf"/>
     </GROUP>
     <GROUP id="{73CA8955-08EF-024C-8468-EC8881CF4BB9}" name="Source">
-      <FILE id="Jpfeuk" name="KalexpanderProcessor.h" compile="0" resource="0"
-            file="Source/KalexpanderProcessor.h"/>
+      <GROUP id="{E67793DC-E5F9-A37E-BC34-5E981EEBACD6}" name="Types">
+        <FILE id="wNCg5X" name="FilterType.h" compile="0" resource="0" file="Source/Types/FilterType.h"/>
+      </GROUP>
+      <GROUP id="{2704E0D8-D4C6-E842-B59B-2E08C84D630D}" name="Audio">
+        <FILE id="UlsnWV" name="Distortion.cpp" compile="1" resource="0" file="Source/Audio/Distortion.cpp"/>
+        <FILE id="lntrla" name="Distortion.h" compile="0" resource="0" file="Source/Audio/Distortion.h"/>
+        <FILE id="rOFwkh" name="Gate.cpp" compile="1" resource="0" file="Source/Audio/Gate.cpp"/>
+        <FILE id="IL0NZ8" name="Gate.h" compile="0" resource="0" file="Source/Audio/Gate.h"/>
+        <FILE id="DwJi6Z" name="PreEmphasisFilter.cpp" compile="1" resource="0"
+              file="Source/Audio/PreEmphasisFilter.cpp"/>
+        <FILE id="GdaLpb" name="PreEmphasisFilter.h" compile="0" resource="0"
+              file="Source/Audio/PreEmphasisFilter.h"/>
+      </GROUP>
       <GROUP id="{D844BC4C-77AF-570B-44AF-D0C6DD78DFCA}" name="UI">
+        <FILE id="rXaf5G" name="FilterPanel.cpp" compile="1" resource="0" file="Source/UI/FilterPanel.cpp"/>
+        <FILE id="zaGyBz" name="FilterPanel.h" compile="0" resource="0" file="Source/UI/FilterPanel.h"/>
         <FILE id="ilcp4o" name="GatePanel.h" compile="0" resource="0" file="Source/UI/GatePanel.h"/>
         <FILE id="Lq33Ex" name="Graphing.h" compile="0" resource="0" file="Source/UI/Graphing.h"/>
         <FILE id="P9OkwP" name="LabelButton.h" compile="0" resource="0" file="Source/UI/LabelButton.h"/>
         <FILE id="lGhxlt" name="LF.h" compile="0" resource="0" file="Source/UI/LF.h"/>
       </GROUP>
       <FILE id="tGAovB" name="Expression.h" compile="0" resource="0" file="Source/Expression.h"/>
-      <FILE id="R2F0U2" name="KrunchProcessor.h" compile="0" resource="0"
-            file="Source/KrunchProcessor.h"/>
       <FILE id="gSobzP" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="lltZjT" name="PluginProcessor.h" compile="0" resource="0"
@@ -58,6 +72,28 @@
         <MODULEPATH id="juce_dsp" path="../../../../../Program Files/JUCE/modules"/>
       </MODULEPATHS>
     </VS2019>
+    <VS2022 targetFolder="Builds/VisualStudio2022" extraDefs="USE_EXPRTK=1"
+            extraCompilerFlags="/Zc:strictStrings- &#10;/bigobj">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="${PROJECT_DIR}../../../../Include/Asio&#10;${PROJECT_DIR}../../../../Include&#10;${PROJECT_DIR}../../../../Source"/>
+        <CONFIGURATION isDebug="0" name="Release" headerPath="${PROJECT_DIR}../../../../Include/Asio&#10;${PROJECT_DIR}../../../../Include&#10;${PROJECT_DIR}../../../../Source"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_dsp" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:\JUCE\modules"/>
+      </MODULEPATHS>
+    </VS2022>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

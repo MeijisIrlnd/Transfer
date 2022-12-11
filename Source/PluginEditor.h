@@ -14,6 +14,7 @@
 #include "UI/Graphing.h"
 #include "UI/GatePanel.h"
 #include "UI/LabelButton.h"
+#include <UI/FilterPanel.h>
 //==============================================================================
 /**
 */
@@ -47,6 +48,7 @@ private:
     Graphing graphing;
 #endif
     GatePanel gatePanel;
-    LabelButton graphButton, gateButton;
+    Transfer::UI::FilterPanel filterPanel;
+    LabelButton filterButton, graphButton, gateButton;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransferAudioProcessorEditor)
 };

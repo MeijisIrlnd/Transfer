@@ -11,7 +11,7 @@
 
 //==============================================================================
 TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcessor& p, juce::AudioProcessorValueTreeState& t)
-    : AudioProcessorEditor (&p), audioProcessor (p), tree(t), gatePanel(tree), graphButton("Graph", juce::Colour(200, 200, 200), true), 
+    : AudioProcessorEditor (&p), audioProcessor (p), tree(t), gatePanel(tree), filterPanel(tree), filterButton("Filter", juce::Colour(200, 200, 200), true), graphButton("Graph", juce::Colour(200, 200, 200), true),
     gateButton("Gate", juce::Colour(200, 200, 200), true), graphing(tree)
 {
     // Make sure that before the constructor has finished, you've set the
@@ -41,20 +41,39 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     yLabel.setFont(lookAndFeel.getFont());
 
     addAndMakeVisible(&yLabel);
+    addAndMakeVisible(&filterPanel);
     addAndMakeVisible(&gatePanel);
     auto selectedPanel = tree.state.getChildWithName("Internal").getProperty("Page");
-    auto intPanel = (int)selectedPanel;
-    if (intPanel == 0) {
-        graphing.setVisible(true);
-        gatePanel.setVisible(false);
+    auto intPanel = static_cast<int>(selectedPanel);
+    switch (intPanel)
+    {
+        case 0: {
+            // Graph
+            graphing.setVisible(true);
+            gatePanel.setVisible(false);
+            filterPanel.setVisible(false);
+            break;
+        }
+        case 1: {
+            // Gate
+            graphing.setVisible(false);
+            gatePanel.setVisible(true);
+            filterPanel.setVisible(false);
+            break;
+        }
+        case 2: {
+            graphing.setVisible(false);
+            gatePanel.setVisible(false);
+            filterPanel.setVisible(true);
+            break;
+        }
     }
-    else {
-        graphing.setVisible(false);
-        gatePanel.setVisible(true);
-    }
+
+    addAndMakeVisible(&filterButton);
     addAndMakeVisible(&graphButton);
     addAndMakeVisible(&gateButton);
 
+    filterButton.addListener(this);
     graphButton.addListener(this);
     gateButton.addListener(this);
     
@@ -98,7 +117,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     displayText << "round(x), roundn(x,n), sgn(x), sqrt(x), sum(x,y..), swap(x,y), trunc(x)\n\n";
     displayText << "Trig:\nsin(x), cos(x), tan(x), asin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x), asinh(x), acosh(x), atanh(x), atan2(x,y), sinc(x), sec(x), cot(x), csc(x), deg2rad(x),";
     displayText << "deg2grad(x), rad2deg(x), grad2deg(x)\n\n";
-    displayText << "Equalities & Operators:\n +, -, *, /, %, ^\n==, !=, <, <=, >, >=";
+    displayText << "Equalities & Operators:\n +, -, *, /, %, ^\n==, !=, <, <=, >, >= WAGWAN";
 
     helpBlock.setText(displayText.str(), false);
 #else 
@@ -154,6 +173,7 @@ void TransferAudioProcessorEditor::onLabelButtonClicked(LabelButton* l)
     {
         graphing.setVisible(true);
         gatePanel.setVisible(false);
+        filterPanel.setVisible(false);
         if (!tree.state.getChildWithName("Internal").isValid()) {
             juce::Identifier ident("Internal");
             juce::ValueTree internalTree(ident);
@@ -167,6 +187,7 @@ void TransferAudioProcessorEditor::onLabelButtonClicked(LabelButton* l)
     else if(l == &gateButton){
         graphing.setVisible(false);
         gatePanel.setVisible(true);
+        filterPanel.setVisible(false);
         if (!tree.state.getChildWithName("Internal").isValid()) {
             juce::Identifier ident("Internal");
             juce::ValueTree internalTree(ident);
@@ -175,6 +196,20 @@ void TransferAudioProcessorEditor::onLabelButtonClicked(LabelButton* l)
         }
         else {
             tree.state.getChildWithName("Internal").setProperty("Page", juce::var(1), nullptr);
+        }
+    }
+    else if (l == &filterButton) {
+        graphing.setVisible(false);
+        gatePanel.setVisible(false);
+        filterPanel.setVisible(true);
+        if (!tree.state.getChildWithName("Internal").isValid()) {
+            juce::Identifier ident("Internal");
+            juce::ValueTree internalTree(ident);
+            tree.state.addChild(internalTree, -1, nullptr);
+            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(2), nullptr);
+        }
+        else {
+            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(2), nullptr);
         }
     }
 }
@@ -196,8 +231,10 @@ void TransferAudioProcessorEditor::resized()
     helpBlock.setBounds(0, h*2, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
     graphing.setBounds(getWidth() / 2 , (h*2) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
     gatePanel.setBounds(getWidth() / 2, (h * 2) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
+    filterPanel.setBounds(getWidth() / 2, (h * 2) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
     graphButton.setBounds(graphing.getX() - getWidth() / 10, graphing.getY(), getWidth() / 10 - 1, getHeight() / 15);
     gateButton.setBounds(graphButton.getX(), graphButton.getY() + graphButton.getHeight() + 2, graphButton.getWidth(), graphButton.getHeight());
+    filterButton.setBounds(gateButton.getX(), gateButton.getY() + gateButton.getHeight() + 2, gateButton.getWidth(), gateButton.getHeight());
     distortionCoefficientLabel.setBounds(0, getHeight() - (h * 2), getWidth() / 4, h );
     distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 2), getWidth() - getWidth() / 4, h / 4);
     zLabel.setBounds(0, getHeight() - h, getWidth() / 4, h);
