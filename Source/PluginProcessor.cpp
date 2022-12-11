@@ -25,7 +25,7 @@ TransferAudioProcessor::TransferAudioProcessor()
 #else 
     : 
 #endif
-    parameterTree(*this, nullptr, juce::Identifier("CMDistortion"), createParameterLayout()), m_distortion(parameterTree)
+    parameterTree(*this, nullptr, juce::Identifier("Transfer"), createParameterLayout()), m_distortion(parameterTree)
 {
     //context.reset(new Expression<float>("x", 0, 0));
     context.reset(new Expression<float>("x", 0, 0));
