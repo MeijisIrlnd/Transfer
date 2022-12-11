@@ -33,6 +33,8 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     juce::AudioProcessorValueTreeState& tree;
+    TitleLF titleLF;
+    InputLF inputLF;
     juce::Label expressionLabel;
     juce::TextEditor expressionInput, yLabel;
     juce::TextEditor helpBlock;

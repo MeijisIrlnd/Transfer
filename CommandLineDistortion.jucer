@@ -47,32 +47,6 @@
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"
                JUCE_ASIO="1"/>
   <EXPORTFORMATS>
-    <VS2019 targetFolder="Builds/VisualStudio2019" extraCompilerFlags="/Zc:strictStrings- &#10;/bigobj"
-            extraDefs="USE_EXPRTK=1">
-      <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="CommandLineDistortion" headerPath="${PROJECT_DIR}../../../../Include/DSPCommon&#10;${PROJECT_DIR}../../../../Include/Asio&#10;${PROJECT_DIR}../../../../Include"
-                       userNotes="copy /Y &quot;$(SolutionDir)../../libs/mathpresso.dll&quot; &quot;$(TargetDir)mathpresso.dll&quot; "/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="CommandLineDistortion"
-                       headerPath="${PROJECT_DIR}../../../../Include/DSPCommon&#10;${PROJECT_DIR}../../../../Include/Asio&#10;${PROJECT_DIR}../../../../Include"
-                       userNotes="copy /Y &quot;$(SolutionDir)../../libs/mathpresso.dll&quot; &quot;$(TargetDir)mathpresso.dll&quot; "
-                       useRuntimeLibDLL="0"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_audio_basics" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="juce_dsp" path="../../../../../Program Files/JUCE/modules"/>
-      </MODULEPATHS>
-    </VS2019>
     <VS2022 targetFolder="Builds/VisualStudio2022" extraDefs="USE_EXPRTK=1"
             extraCompilerFlags="/Zc:strictStrings- &#10;/bigobj">
       <CONFIGURATIONS>

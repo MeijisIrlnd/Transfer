@@ -52,7 +52,7 @@ namespace Transfer::UI
         l->setText(labelText, juce::dontSendNotification);
         addAndMakeVisible(l);
         s->setSliderStyle(juce::Slider::LinearBar);
-        s->setTextBoxStyle(juce::Slider::TextBoxRight, false, 50, 30);
+        s->setTextBoxStyle(juce::Slider::TextBoxRight, true, 50, 30);
         s->setTextValueSuffix(units);
         addAndMakeVisible(s);
     }

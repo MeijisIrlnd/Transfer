@@ -19,8 +19,11 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     setSize (800, 900);
     setLookAndFeel(&lookAndFeel);
     addAndMakeVisible(&graphing);
+    expressionInput.setLookAndFeel(&inputLF);
     expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
-    expressionLabel.setText("Transfer Function:", juce::dontSendNotification);
+    expressionLabel.setLookAndFeel(&titleLF);
+    expressionLabel.setJustificationType(juce::Justification::centred);
+    expressionLabel.setText("are you sure you want me to die?", juce::dontSendNotification);
     expressionInput.setFont(lookAndFeel.getFont());
     std::string ipText = tree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
     if (ipText == "") { ipText = "x"; }
@@ -37,7 +40,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
 
     yLabel.setColour(juce::TextEditor::textColourId, juce::Colours::black);
     yLabel.setReadOnly(true);
-    yLabel.setText("Y = ", juce::dontSendNotification);
+    yLabel.setText("H(s)=", juce::dontSendNotification);
     yLabel.setFont(lookAndFeel.getFont());
 
     addAndMakeVisible(&yLabel);
@@ -104,10 +107,6 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     };
     addAndMakeVisible(&expressionInput);
     helpBlock.setMultiLine(true);
-    //atan(x*d) * 1/z
-    //helpBlock.setText(
-    //    "Variables:\nx = Input Sample\nd = Distortion Coefficient\nz = User Defined, 0 to 1\nE = 2.7182818284590452354\nPI = 3.14159265358979323846\n\nFunctions:\nsin(x), cos(x), tan(x)\nasin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x)\npow(x, y), sqrt(x)\nlog(x), log2(x), log10(x)\nfrac(x), recip(x)\nmin(x,y), max(x,y)\navg(x,y), ceil(x), floor(x)\nround(x), roundeven(x), trunc(x)\nsignbit(x), copysign(x,y)\n\nOperators:\n+, -, *, /, %\n!(x), -(x)\n", false
-    //);
 #if defined USE_EXPRTK
     std::stringstream displayText;
     displayText << "Variables:\nx = Input Sample\nd = Distortion coefficient\nz = User defined (0 to 1)\n\n";
@@ -117,7 +116,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     displayText << "round(x), roundn(x,n), sgn(x), sqrt(x), sum(x,y..), swap(x,y), trunc(x)\n\n";
     displayText << "Trig:\nsin(x), cos(x), tan(x), asin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x), asinh(x), acosh(x), atanh(x), atan2(x,y), sinc(x), sec(x), cot(x), csc(x), deg2rad(x),";
     displayText << "deg2grad(x), rad2deg(x), grad2deg(x)\n\n";
-    displayText << "Equalities & Operators:\n +, -, *, /, %, ^\n==, !=, <, <=, >, >= WAGWAN";
+    displayText << "Equalities & Operators:\n +, -, *, /, %, ^\n==, !=, <, <=, >, >=";
 
     helpBlock.setText(displayText.str(), false);
 #else 
@@ -165,6 +164,8 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
 
 TransferAudioProcessorEditor::~TransferAudioProcessorEditor()
 {
+    expressionInput.setLookAndFeel(nullptr);
+    expressionInput.setLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
 }
 
@@ -226,18 +227,32 @@ void TransferAudioProcessorEditor::paint (juce::Graphics& g)
 void TransferAudioProcessorEditor::resized()
 {
     auto h = getHeight() / 10;
-    expressionLabel.setBounds(0, 0, getWidth(), h);
-    yLabel.setBounds(0, h, getWidth() / 24, h);
-    expressionInput.setBounds(getWidth() / 24, h, getWidth(), h);
-    helpBlock.setBounds(0, h*2, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
-    graphing.setBounds(getWidth() / 2 , (h*2) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
-    gatePanel.setBounds(getWidth() / 2, (h * 2) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
-    filterPanel.setBounds(getWidth() / 2, (h * 2) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
+    //expressionLabel.setBounds(0, h, getWidth() / 8, h);
+    //yLabel.setBounds(getWidth() / 8, h, getWidth() / 24, h);
+    //expressionInput.setBounds(getWidth() / 8 + getWidth() / 24, h, getWidth() - (getWidth() / 8 + getWidth() / 24), h);
+    expressionLabel.setBounds(0, h / 5, getWidth(), h / 2);
+    yLabel.setBounds(0, h, getWidth() / 16, h / 2);
+    expressionInput.setBounds(getWidth() / 16, h, (getWidth() - yLabel.getWidth()) - 10, h / 4);
+    //helpBlock.setBounds(0, h*2, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
+    //graphing.setBounds(getWidth() / 2 , (h*2) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
+    //gatePanel.setBounds(getWidth() / 2, (h * 2) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
+    //filterPanel.setBounds(getWidth() / 2, (h * 2) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
+    //graphButton.setBounds(graphing.getX() - getWidth() / 10, graphing.getY(), getWidth() / 10 - 1, getHeight() / 15);
+    //gateButton.setBounds(graphButton.getX(), graphButton.getY() + graphButton.getHeight() + 2, graphButton.getWidth(), graphButton.getHeight());
+    //filterButton.setBounds(gateButton.getX(), gateButton.getY() + gateButton.getHeight() + 2, gateButton.getWidth(), gateButton.getHeight());
+    //distortionCoefficientLabel.setBounds(0, getHeight() - (h * 2), getWidth() / 4, h );
+    //distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 2), getWidth() - getWidth() / 4, h / 4);
+    //zLabel.setBounds(0, getHeight() - h, getWidth() / 4, h);
+    //zSlider.setBounds(getWidth() / 4, getHeight() - h, getWidth() - getWidth() / 4, h / 4);
+    helpBlock.setBounds(0, h*1.5, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
+    graphing.setBounds(getWidth() / 2 , (h*1.5) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
+    gatePanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
+    filterPanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
     graphButton.setBounds(graphing.getX() - getWidth() / 10, graphing.getY(), getWidth() / 10 - 1, getHeight() / 15);
     gateButton.setBounds(graphButton.getX(), graphButton.getY() + graphButton.getHeight() + 2, graphButton.getWidth(), graphButton.getHeight());
     filterButton.setBounds(gateButton.getX(), gateButton.getY() + gateButton.getHeight() + 2, gateButton.getWidth(), gateButton.getHeight());
-    distortionCoefficientLabel.setBounds(0, getHeight() - (h * 2), getWidth() / 4, h );
-    distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 2), getWidth() - getWidth() / 4, h / 4);
+    distortionCoefficientLabel.setBounds(0, getHeight() - (h * 1.5), getWidth() / 4, h );
+    distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 1.5), (getWidth() - getWidth() / 4) - 10, h / 4);
     zLabel.setBounds(0, getHeight() - h, getWidth() / 4, h);
-    zSlider.setBounds(getWidth() / 4, getHeight() - h, getWidth() - getWidth() / 4, h / 4);
+    zSlider.setBounds(getWidth() / 4, getHeight() - h, (getWidth() - getWidth() / 4) - 10, h / 4);
 }
