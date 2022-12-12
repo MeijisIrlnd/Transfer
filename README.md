@@ -16,7 +16,7 @@ as far as i can tell, most of the obvious crashes are sorted (checking for nan /
 ## starting points
 sigmoid functions tend to be a nice starting point, [the wikipedia article for them](https://en.wikipedia.org/wiki/Sigmoid_function) has a bunch of examples. some functions i've been using to test, though, are:
 - `(tanh(x * d^3) / tanh(d^3)) * z` is a nice starting point, the exponent makes it 'clippier', and dividing by the numerator without the x term means the result can't go above 1 
-- `(sinc(x * d) / (sinc(d)) * z` does a Kahn & Neek - Percy style distortion on kicks, pretty wacky
+- `(sinc(x * d) / (sinc(d)) * z` does a [Kahn & Neek - Percy](https://www.youtube.com/watch?v=R4XlhUBOXV8) style distortion on kicks, pretty wacky
 - `(atan(x * d) / atan(d)) * z` seems to be a harsher version of tanh
 ## licensing, etc: 
 transfer makes use of the following: 
