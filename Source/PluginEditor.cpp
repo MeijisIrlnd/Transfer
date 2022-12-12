@@ -227,23 +227,9 @@ void TransferAudioProcessorEditor::paint (juce::Graphics& g)
 void TransferAudioProcessorEditor::resized()
 {
     auto h = getHeight() / 10;
-    //expressionLabel.setBounds(0, h, getWidth() / 8, h);
-    //yLabel.setBounds(getWidth() / 8, h, getWidth() / 24, h);
-    //expressionInput.setBounds(getWidth() / 8 + getWidth() / 24, h, getWidth() - (getWidth() / 8 + getWidth() / 24), h);
     expressionLabel.setBounds(0, h / 5, getWidth(), h / 2);
     yLabel.setBounds(0, h, getWidth() / 16, h / 2);
     expressionInput.setBounds(getWidth() / 16, h, (getWidth() - yLabel.getWidth()) - 10, h / 4);
-    //helpBlock.setBounds(0, h*2, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
-    //graphing.setBounds(getWidth() / 2 , (h*2) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
-    //gatePanel.setBounds(getWidth() / 2, (h * 2) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
-    //filterPanel.setBounds(getWidth() / 2, (h * 2) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
-    //graphButton.setBounds(graphing.getX() - getWidth() / 10, graphing.getY(), getWidth() / 10 - 1, getHeight() / 15);
-    //gateButton.setBounds(graphButton.getX(), graphButton.getY() + graphButton.getHeight() + 2, graphButton.getWidth(), graphButton.getHeight());
-    //filterButton.setBounds(gateButton.getX(), gateButton.getY() + gateButton.getHeight() + 2, gateButton.getWidth(), gateButton.getHeight());
-    //distortionCoefficientLabel.setBounds(0, getHeight() - (h * 2), getWidth() / 4, h );
-    //distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 2), getWidth() - getWidth() / 4, h / 4);
-    //zLabel.setBounds(0, getHeight() - h, getWidth() / 4, h);
-    //zSlider.setBounds(getWidth() / 4, getHeight() - h, getWidth() - getWidth() / 4, h / 4);
     helpBlock.setBounds(0, h*1.5, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
     graphing.setBounds(getWidth() / 2 , (h*1.5) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
     gatePanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
