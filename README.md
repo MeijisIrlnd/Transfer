@@ -13,14 +13,19 @@ as is the nature of something like this, it's pretty easy to annihilate your hea
 ## crashes 
 as far as i can tell, most of the obvious crashes are sorted (checking for nan / inf, division by zero, all the boring stuff), but if you find anything spicy that crashes it do let me know. if you type in an expression which can't compile, it'll just revert to linear (y = x), and if it finds nans or infs or -nans or -infs, it zeroes them. I also have as yet not tried this on mac, but in the next few days am hoping to get that knocked out.
 
+## starting points
+sigmoid functions tend to be a nice starting point, [the wikipedia article for them](https://en.wikipedia.org/wiki/Sigmoid_function) has a bunch of examples. some functions i've been using to test, though, are:
+- `(tanh(x * d^3) / tanh(d^3)) * z` is a nice starting point, the exponent makes it 'clippier', and dividing by the numerator without the x term means the result can't go above 1 
+- `(sinc(x * d) / (sinc(d)) * z` does a Kahn & Neek - Percy style distortion on kicks, pretty wacky
+- `(atan(x * d) / atan(d)) * z` seems to be a harsher version of tanh
 ## licensing, etc: 
 am adding the legal stuff also over the next few days, but transfer makes use of the following: 
-- ![juce](https://juce.com/)
-- ![exprtk](http://www.partow.net/programming/exprtk/)
-- ![SDSP (my fledgling DSP helper library)](https://github.com/MeijisIrlnd/SDSP)
-- ![asio (low latency in standalone...)](https://www.asio4all.org/)
+- [juce](https://juce.com/)
+- [exprtk](http://www.partow.net/programming/exprtk/)
+- [SDSP (my fledgling DSP helper library)](https://github.com/MeijisIrlnd/SDSP)
+- [asio (low latency in standalone...)](https://www.asio4all.org/)
 - android's droid sans mono font for that calculator aesthetic 
-- also tried ![atmsp](https://github.com/ArashPartow/math-parser-benchmark-project/blob/master/atmsp/atmsp.h) and ![mathpresso](https://github.com/kobalicek/mathpresso) before settling on exprtk, but some files from those may still be in the project or on other branches
+- also tried [atmsp](https://github.com/ArashPartow/math-parser-benchmark-project/blob/master/atmsp/atmsp.h) and ![mathpresso](https://github.com/kobalicek/mathpresso) before settling on exprtk, but some files from those may still be in the project or on other branches
 
 
 
