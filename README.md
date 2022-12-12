@@ -19,7 +19,7 @@ sigmoid functions tend to be a nice starting point, [the wikipedia article for t
 - `(sinc(x * d) / (sinc(d)) * z` does a Kahn & Neek - Percy style distortion on kicks, pretty wacky
 - `(atan(x * d) / atan(d)) * z` seems to be a harsher version of tanh
 ## licensing, etc: 
-am adding the legal stuff also over the next few days, but transfer makes use of the following: 
+transfer makes use of the following: 
 - [juce](https://juce.com/)
 - [exprtk](http://www.partow.net/programming/exprtk/)
 - [SDSP (my fledgling DSP helper library)](https://github.com/MeijisIrlnd/SDSP)
