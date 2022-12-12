@@ -9,8 +9,12 @@
               pluginAUIsSandboxSafe="1">
   <MAINGROUP id="q5aHrr" name="Transfer">
     <GROUP id="{E1BD8A85-B738-0C04-A90A-6AD1615459FF}" name="Resources">
+      <FILE id="Bcejyy" name="agree-personal-use.regular.otf" compile="0"
+            resource="1" file="Resources/agree-personal-use.regular.otf"/>
       <FILE id="fPRxmI" name="DroidSansMono.ttf" compile="0" resource="1"
             file="Resources/DroidSansMono.ttf"/>
+      <FILE id="LBRerz" name="Wetdreamzmedium-LYxZ.otf" compile="0" resource="1"
+            file="Resources/Wetdreamzmedium-LYxZ.otf"/>
     </GROUP>
     <GROUP id="{73CA8955-08EF-024C-8468-EC8881CF4BB9}" name="Source">
       <GROUP id="{E67793DC-E5F9-A37E-BC34-5E981EEBACD6}" name="Types">

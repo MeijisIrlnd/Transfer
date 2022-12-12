@@ -8,11 +8,17 @@
 
 namespace BinaryData
 {
+    extern const char*   agreepersonaluse_regular_otf;
+    const int            agreepersonaluse_regular_otfSize = 15496;
+
     extern const char*   DroidSansMono_ttf;
     const int            DroidSansMono_ttfSize = 119380;
 
+    extern const char*   WetdreamzmediumLYxZ_otf;
+    const int            WetdreamzmediumLYxZ_otfSize = 11612;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 1;
+    const int namedResourceListSize = 3;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

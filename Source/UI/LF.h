@@ -22,12 +22,18 @@ public:
         setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentWhite);
         setColour(juce::Label::textColourId, juce::Colours::black);
         setColour(juce::TextEditor::outlineColourId, juce::Colour(200, 200, 200));
+        setColour(juce::TextEditor::highlightColourId, juce::Colour(100, 100, 100));
+        
         setColour(juce::ComboBox::backgroundColourId, juce::Colour(200, 200, 200));
         setColour(juce::ComboBox::textColourId, juce::Colour(juce::Colours::black));
         setColour(juce::PopupMenu::backgroundColourId, juce::Colour(200, 200, 200));
         setColour(juce::PopupMenu::ColourIds::highlightedTextColourId, juce::Colour(200, 200, 200));
         setColour(juce::PopupMenu::ColourIds::textColourId, juce::Colours::black);
+        
+        setColour(juce::CaretComponent::ColourIds::caretColourId, juce::Colour(0xFF7F7F7F));
+
         font = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::DroidSansMono_ttf, BinaryData::DroidSansMono_ttfSize));
+        //font = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::agreepersonaluse_regular_otf, BinaryData::agreepersonaluse_regular_otfSize));
     }
 
     ~LF() override { }
@@ -39,16 +45,18 @@ protected:
     juce::Font font;
 };
 
-class TitleLF : public LF
+class TitleLF : public juce::LookAndFeel_V4
 {
 public:
     TitleLF()
     {
-        setColour(juce::Label::ColourIds::textColourId, juce::Colour(100, 100, 100));
+        setColour(juce::Label::ColourIds::textColourId, juce::Colour(0x237F7F7F));
     }
 
     ~TitleLF() override { }
-    juce::Font getLabelFont(juce::Label& label) override { return font.withHeight(label.getHeight() / 2.0f).withExtraKerningFactor(-.05); }
+    juce::Font getLabelFont(juce::Label& label) override { 
+        return juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::WetdreamzmediumLYxZ_otf, BinaryData::WetdreamzmediumLYxZ_otfSize)).withHeight(label.getHeight());
+    }
 };
 
 class InputLF : public LF
@@ -57,7 +65,10 @@ public:
     InputLF()
     {
         setColour(juce::TextEditor::outlineColourId, juce::Colour(100, 100, 100));
+        setColour(juce::TextEditor::highlightColourId, juce::Colour(100, 100, 100));
+        setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, juce::Colours::black);
     }
 
     ~InputLF() override {}
+    
 };

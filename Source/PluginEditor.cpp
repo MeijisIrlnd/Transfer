@@ -17,13 +17,15 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (800, 900);
+    expressionLabel.setLookAndFeel(&titleLF);
+    expressionLabel.setFont(titleLF.getLabelFont(expressionLabel));
+    expressionLabel.setJustificationType(juce::Justification::centred);
+    expressionLabel.setText("transfer", juce::dontSendNotification);
     setLookAndFeel(&lookAndFeel);
     addAndMakeVisible(&graphing);
     expressionInput.setLookAndFeel(&inputLF);
     expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
-    expressionLabel.setLookAndFeel(&titleLF);
-    expressionLabel.setJustificationType(juce::Justification::centred);
-    expressionLabel.setText("are you sure you want me to die?", juce::dontSendNotification);
+
     expressionInput.setFont(lookAndFeel.getFont());
     std::string ipText = tree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
     if (ipText == "") { ipText = "x"; }
