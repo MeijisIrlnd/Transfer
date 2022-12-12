@@ -1,6 +1,6 @@
 # Transfer
 #### because normal distortions are boring
-![image](https://user-images.githubusercontent.com/38221014/206887423-eff0b3ed-caf9-434f-b839-9aa25a6edff0.png)
+![image](![image](https://user-images.githubusercontent.com/38221014/206948619-53d9cff0-6e32-4d26-ae47-7540a9bf4fbf.png))
 ## about 
 transfer is a waveshaper based distortion, except the transfer function is JIT compiled from text inputted by the user. it started as a tool for testing different transfer functions in other projects, but evolved into a pretty cool and unique plugin (<i>disclaimer it might not be that unique I have done absolutely no market research whatsoever)</i> it's also got a built in gate, and a WIP emphasis filter (currently only high or low shelves but working on it).
 
