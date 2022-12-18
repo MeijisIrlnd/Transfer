@@ -41,6 +41,17 @@ public:
     juce::Font getComboBoxFont(juce::ComboBox& source) override { return font.withHeight(source.getHeight()); }
     juce::Font getPopupMenuFont() override { return font; }
     juce::Font& getFont() { return font; }
+
+    static inline void instantiateHorizontalSlider(juce::Component* parent, juce::Slider* s, juce::Label* l, const juce::String& labelText)
+    {
+        l->setJustificationType(juce::Justification::centredTop);
+        l->setText(labelText, juce::dontSendNotification);
+        parent->addAndMakeVisible(l);
+        s->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
+        s->setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+        parent->addAndMakeVisible(s);
+    }
+
 protected: 
     juce::Font font;
 };

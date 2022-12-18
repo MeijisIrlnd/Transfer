@@ -57,13 +57,17 @@ public:
 
     void setContext(const std::string expression);
     void setDistortionCoefficient(double newCoefficient);
+    void setY(double newY);
     void setZ(double newZ);
+    SDSP_INLINE void clearRegisters() { if (context != nullptr) context->zeroRegisters(); }
+
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout() noexcept;
     juce::AudioProcessorValueTreeState parameterTree;
     std::unique_ptr<Expression<float>> context;
     Transfer::Audio::Distortion m_distortion;
     double currentCoefficient = 1;
+    double currentY{ 0 };
     double currentZ = 0;
 
     //==============================================================================

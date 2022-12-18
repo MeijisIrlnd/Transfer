@@ -32,17 +32,19 @@ public:
         setLookAndFeel(&lookAndFeel);
         dataset.reserve(100);
         t.addParameterListener("D", this);
+        t.addParameterListener("Y", this);
         t.addParameterListener("Z", this);
-#if defined USE_EXPRTK
         symbolTable.add_variable("x", currentIp);
         symbolTable.add_variable("d", coeff);
+        symbolTable.add_variable("y", y);
         symbolTable.add_variable("z", z);
         symbolTable.add_variable("prev", previous);
+        symbolTable.add_vector("gpr", gpr.data(), gpr.size());
         
         symbolTable.add_constants();
         expression.register_symbol_table(symbolTable);
         parser.settings().disable_all_control_structures();
-#endif
+        parser.settings().enable_all_control_structures();
         startTimer(16.7);
     }
 
@@ -50,12 +52,14 @@ public:
     {
         setLookAndFeel(nullptr);
         m_tree.removeParameterListener("D", this);
+        m_tree.removeParameterListener("Y", this);
         m_tree.removeParameterListener("Z", this);
     }
 
     void parameterChanged(const juce::String& id, float newValue) override
     {
         if (id == "D") setDistortionCoeff(newValue);
+        else if (id == "Y") setY(newValue);
         else if (id == "Z") setZ(newValue);
     }
 
@@ -123,28 +127,28 @@ public:
 
     void updateExpr(std::string newExpr)
     {
-#if defined USE_EXPRTK
+        clearRegisters();
         if (parser.compile(newExpr, expression)) { hasTransfer = true; }
         else { hasTransfer = false; }
-#else 
-        auto err = parser.parse(byteCode, newExpr, "x,d,z");
-        if (err) {
-            hasTransfer = false;
-        }
-        else {
-            hasTransfer = true;
-        }
-#endif
+
         repaintRequested.store(true);
     }
 
-    void setDistortionCoeff(double newCoeff)
+    SDSP_INLINE void clearRegisters() {
+        std::fill(gpr.begin(), gpr.end(), 0);
+    }
+    SDSP_INLINE void setDistortionCoeff(double newCoeff)
     {
         coeff = newCoeff;
         repaintRequested.store(true);
     }
 
-    void setZ(double newZ)
+    SDSP_INLINE void setY(double newY) {
+        y = newY;
+        repaintRequested.store(true);
+    }
+
+    SDSP_INLINE void setZ(double newZ)
     {
         z = newZ;
         repaintRequested.store(true);
@@ -154,7 +158,6 @@ public:
     {
         dataset.clear();
         auto valIncrement = 2 / (double)numPixels;
-#if defined USE_EXPRTK
         for (double i = -1; i <= 1; i += valIncrement) {
             currentIp = i;
             try {
@@ -174,18 +177,7 @@ public:
                 dataset.push_back(0);
             }
         }
-#else 
-        byteCode.var[0] = 0;
-        byteCode.var[1] = coeff;
-        byteCode.var[2] = z;
 
-        for (double i = -1; i <= 1; i += valIncrement) {
-            byteCode.var[0] = i;
-            auto res = byteCode.run();
-            if (std::isnan(res) || std::isinf(res)) dataset.push_back(0);
-            else dataset.push_back(res);
-        }
-#endif
         repaintRequested.store(false);
         repaint();
     }
@@ -210,21 +202,13 @@ private:
     int numPixels;
     bool hasTransfer = false;
 
-#if defined USE_EXPRTK
     exprtk::symbol_table<T> symbolTable;
     exprtk::expression<T> expression;
     exprtk::parser<T> parser;
-    T z = 0;
-    T coeff = 1;
+    T y{ 0 }, z{ 0 }, coeff{ 1 };
     T currentIp = 0;
     T previous = 0;
-#else 
-    ATMSP<float> parser;
-    ATMSB<float> byteCode;
-    double z = 0;
-    double coeff = 1;
-#endif
-
+    std::array<T, 4> gpr = { 0, 0, 0, 0 };
     std::mutex m_mutex;
     std::vector<float> dataset;
     std::atomic_bool repaintRequested{ true };

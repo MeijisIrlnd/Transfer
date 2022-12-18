@@ -30,6 +30,7 @@ TransferAudioProcessor::TransferAudioProcessor()
     //context.reset(new Expression<float>("x", 0, 0));
     context.reset(new Expression<float>("x", 0, 0));
     parameterTree.addParameterListener("D", this);
+    parameterTree.addParameterListener("Y", this);
     parameterTree.addParameterListener("Z", this);
 }
 
@@ -40,6 +41,7 @@ TransferAudioProcessor::~TransferAudioProcessor()
 void TransferAudioProcessor::parameterChanged(const juce::String& id, float newValue)
 {
     if (id == "D") setDistortionCoefficient(newValue);
+    if (id == "Y") setY(newValue);
     else if (id == "Z") setZ(newValue);
 }
 
@@ -225,6 +227,13 @@ void TransferAudioProcessor::setDistortionCoefficient(double newCoefficient)
     if(context != nullptr) context->setDistortionCoefficient(newCoefficient);
 }
 
+void TransferAudioProcessor::setY(double newY)
+{
+    currentY = newY;
+    if (context != nullptr) context->setY(newY);
+}
+
+
 void TransferAudioProcessor::setZ(double newZ)
 {
     currentZ = newZ;
@@ -237,6 +246,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout TransferAudioProcessor::crea
     using FloatParam = juce::AudioParameterFloat;
     using ChoiceParam = juce::AudioParameterChoice;
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"D",1}, "D", juce::NormalisableRange<float>(0, 10, 0.001), 0));
+    layout.add(std::make_unique<FloatParam>(juce::ParameterID{ "Y", 1 }, "Y", juce::NormalisableRange<float>(0, 1, 0.01), 0));
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"Z",1}, "Z", juce::NormalisableRange<float>(0, 1, 0.001), 0));
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"Threshold", 1}, "Threshold", -100, 0, -10));
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"Ratio", 1}, "Ratio", 1.5f, 20, 2));

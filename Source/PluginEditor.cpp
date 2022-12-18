@@ -11,212 +11,180 @@
 
 //==============================================================================
 TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcessor& p, juce::AudioProcessorValueTreeState& t)
-    : AudioProcessorEditor (&p), audioProcessor (p), tree(t), gatePanel(tree), filterPanel(tree), filterButton("Filter", juce::Colour(200, 200, 200), true), graphButton("Graph", juce::Colour(200, 200, 200), true),
-    gateButton("Gate", juce::Colour(200, 200, 200), true), graphing(tree)
+    : AudioProcessorEditor (&p), m_audioProcessor (p), m_tree(t), m_gatePanel(m_tree), m_filterPanel(m_tree), m_filterButton("Filter", juce::Colour(200, 200, 200), true), 
+    m_graphButton("Graph", juce::Colour(200, 200, 200), true),
+    m_gateButton("Gate", juce::Colour(200, 200, 200), true),
+    m_registerClearButton("CLR GPR", juce::Colour(200, 200, 200), true),
+    m_graphing(m_tree)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (800, 900);
-    expressionLabel.setLookAndFeel(&titleLF);
-    expressionLabel.setFont(titleLF.getLabelFont(expressionLabel));
-    expressionLabel.setJustificationType(juce::Justification::centred);
-    expressionLabel.setText("transfer", juce::dontSendNotification);
-    setLookAndFeel(&lookAndFeel);
-    addAndMakeVisible(&graphing);
-    expressionInput.setLookAndFeel(&inputLF);
-    expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    setSize (800, 1000);
+    m_expressionLabel.setLookAndFeel(&m_titleLF);
+    m_expressionLabel.setFont(m_titleLF.getLabelFont(m_expressionLabel));
+    m_expressionLabel.setJustificationType(juce::Justification::centred);
+    m_expressionLabel.setText("transfer", juce::dontSendNotification);
+    setLookAndFeel(&m_lookAndFeel);
+    addAndMakeVisible(&m_graphing);
+    m_expressionInput.setLookAndFeel(&m_inputLF);
+    m_expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
 
-    expressionInput.setFont(lookAndFeel.getFont());
-    std::string ipText = tree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
+    m_expressionInput.setFont(m_lookAndFeel.getFont());
+
+    std::string ipText = m_tree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
     if (ipText == "") { ipText = "x"; }
-    expressionInput.setText(ipText, juce::dontSendNotification);
-    graphing.updateExpr(expressionInput.getText().toStdString());
-    auto dParam = tree.getParameter("D");
+    m_expressionInput.setText(ipText, juce::dontSendNotification);
+    m_graphing.updateExpr(m_expressionInput.getText().toStdString());
+    auto dParam = m_tree.getParameter("D");
     auto dv = dParam->getNormalisableRange().convertFrom0to1(dParam->getValue());
-    graphing.setDistortionCoeff(dv);
-    auto zParam = tree.getParameter("Z");
+    m_graphing.setDistortionCoeff(dv);
+    auto zParam = m_tree.getParameter("Z");
     auto dz = zParam->getNormalisableRange().convertFrom0to1(zParam->getValue());
-    graphing.setZ(dz);
+    m_graphing.setZ(dz);
 
-    addAndMakeVisible(&expressionLabel);
+    addAndMakeVisible(&m_expressionLabel);
 
-    yLabel.setColour(juce::TextEditor::textColourId, juce::Colours::black);
-    yLabel.setReadOnly(true);
-    yLabel.setText("H(s)=", juce::dontSendNotification);
-    yLabel.setFont(lookAndFeel.getFont());
+    m_hxLabel.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    m_hxLabel.setReadOnly(true);
+    m_hxLabel.setText("H(s)=", juce::dontSendNotification);
+    m_hxLabel.setFont(m_lookAndFeel.getFont());
 
-    addAndMakeVisible(&yLabel);
-    addAndMakeVisible(&filterPanel);
-    addAndMakeVisible(&gatePanel);
-    auto selectedPanel = tree.state.getChildWithName("Internal").getProperty("Page");
+    addAndMakeVisible(&m_hxLabel);
+    addAndMakeVisible(&m_filterPanel);
+    addAndMakeVisible(&m_gatePanel);
+    auto selectedPanel = m_tree.state.getChildWithName("Internal").getProperty("Page");
     auto intPanel = static_cast<int>(selectedPanel);
     switch (intPanel)
     {
         case 0: {
             // Graph
-            graphing.setVisible(true);
-            gatePanel.setVisible(false);
-            filterPanel.setVisible(false);
+            m_graphing.setVisible(true);
+            m_gatePanel.setVisible(false);
+            m_filterPanel.setVisible(false);
             break;
         }
         case 1: {
             // Gate
-            graphing.setVisible(false);
-            gatePanel.setVisible(true);
-            filterPanel.setVisible(false);
+            m_graphing.setVisible(false);
+            m_gatePanel.setVisible(true);
+            m_filterPanel.setVisible(false);
             break;
         }
         case 2: {
-            graphing.setVisible(false);
-            gatePanel.setVisible(false);
-            filterPanel.setVisible(true);
+            m_graphing.setVisible(false);
+            m_gatePanel.setVisible(false);
+            m_filterPanel.setVisible(true);
             break;
         }
     }
+    addAndMakeVisible(&m_registerClearButton);
+    addAndMakeVisible(&m_filterButton);
+    addAndMakeVisible(&m_graphButton);
+    addAndMakeVisible(&m_gateButton);
 
-    addAndMakeVisible(&filterButton);
-    addAndMakeVisible(&graphButton);
-    addAndMakeVisible(&gateButton);
-
-    filterButton.addListener(this);
-    graphButton.addListener(this);
-    gateButton.addListener(this);
+    m_registerClearButton.addListener(this);
+    m_filterButton.addListener(this);
+    m_graphButton.addListener(this);
+    m_gateButton.addListener(this);
     
 
-
-    helpBlock.setFont(lookAndFeel.getFont());
-    helpBlock.setColour(juce::TextEditor::textColourId, juce::Colour(100, 100, 100));
-    expressionInput.onReturnKey = [this] {
+    m_helpBlock.setFont(m_lookAndFeel.getFont());
+    m_helpBlock.setColour(juce::TextEditor::textColourId, juce::Colour(100, 100, 100));
+    m_expressionInput.onReturnKey = [this] {
         try {
-#ifndef USE_EXPRTK
-            auto text = expressionInput.getText();
-            if (!text.contains("atan2")) {
-                audioProcessor.setContext(expressionInput.getText().toStdString());
-                graphing.updateExpr(expressionInput.getText().toStdString());
-            }
-            else {
-                audioProcessor.setContext("x");
-                graphing.updateExpr("x");
-            }
-#else 
-            audioProcessor.setContext(expressionInput.getText().toStdString());
-            graphing.updateExpr(expressionInput.getText().toStdString());
-#endif
+
+            m_audioProcessor.setContext(m_expressionInput.getText().toStdString());
+            m_graphing.updateExpr(m_expressionInput.getText().toStdString());
         }
         catch(std::exception& e){
             //Don't
         }
     };
-    addAndMakeVisible(&expressionInput);
-    helpBlock.setMultiLine(true);
-#if defined USE_EXPRTK
+    addAndMakeVisible(&m_expressionInput);
+    m_helpBlock.setMultiLine(true);
     std::stringstream displayText;
-    displayText << "Variables:\nx = Input Sample\nd = Distortion coefficient\nz = User defined (0 to 1)\n\n";
+    displayText << "Variables:\nx: Input Sample\nd: distortion coefficient (0 to 10\ny: user defined (0 to 1)\nz: user defined (0 to 1)\ngpr[0...4]: general purpose registers\n\n";
     displayText << "Logical:\nand, nand, mand, &, nor, xor, |, nor, xnor, not, \n\n";
     displayText << "General:\nabs(x), avg(x,y..), ceil(x), clamp(mn,x,mx), equal(x,y), erf(x), erfc(x), exp(x), expm1(x), floor(x), frac(x), hypot(x,y), iclamp(mn,x,mx),";
     displayText << "inrange(mn,x,mx), log(x), log10(x), log1p(x), log2(x), logn(x,n), max(x,y..), min(x,y..), mul(x,y..), ncdf(x), not_equal(x,y), pow(x,y), root(x,n),";
     displayText << "round(x), roundn(x,n), sgn(x), sqrt(x), sum(x,y..), swap(x,y), trunc(x)\n\n";
     displayText << "Trig:\nsin(x), cos(x), tan(x), asin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x), asinh(x), acosh(x), atanh(x), atan2(x,y), sinc(x), sec(x), cot(x), csc(x), deg2rad(x),";
     displayText << "deg2grad(x), rad2deg(x), grad2deg(x)\n\n";
-    displayText << "Equalities & Operators:\n +, -, *, /, %, ^\n==, !=, <, <=, >, >=";
+    displayText << "Equalities & Operators:\n +, -, *, /, %, ^\n==, !=, <, <=, >, >=\n\n";
+    displayText << "Control Flow:\nif(x) y;, if(x) y; else z;, \nif(x) y; else if(z) a;\n\n";
+    displayText << "Assignment:\n:=, +=, -=, *=, /=, %=\n\n";
+    displayText << "~(x, y, ... n): evaluate exprs left to right, return value of last expr";
 
-    helpBlock.setText(displayText.str(), false);
-#else 
+    m_helpBlock.setText(displayText.str(), false);
 
-    helpBlock.setText(
-        juce::String("Variables:\n") +
-        juce::String("x = Input Sample\n") +
-        juce::String("d = Distortion Coefficient (1 to 10)\n") +
-        juce::String("z = User defined (0 to 1)\n") +
-        juce::String("$e = Euler's Number (2.7182818284590452354)\n") +
-        juce::String("$pi = PI(3.14159265358979323846)\n\n") +
-        juce::String("Functions: \n") +
-        juce::String("abs(x),\n") +
-        juce::String("sin(x), cos(x), tan(x),\n") +
-        juce::String("sinh(x), cosh(x), tanh(x),\n") +
-        juce::String("asin(x), acos(x), atan(x),\n") +
-        juce::String("exp(x),\n") +
-        juce::String("log(x), log2(x), log10(x),\n") +
-        juce::String("sqrt(x),\n") +
-        juce::String("floor(x, y), round(x), min(x, y), max(x, y),\n") +
-        juce::String("sig(x)\n\n") +
-        juce::String("Operators: \n") +
-        juce::String("+, -, *, /, ^"), false);
-#endif
+    m_helpBlock.setReadOnly(true);
+    addAndMakeVisible(&m_helpBlock);
+    LF::instantiateHorizontalSlider(this, &m_distortionCoefficientSlider, &m_distortionCoefficientLabel, "Distortion Coefficient");
+    m_coeffAttachment.reset(new juce::SliderParameterAttachment(*m_tree.getParameter("D"), m_distortionCoefficientSlider));
+    LF::instantiateHorizontalSlider(this, &m_ySlider, &m_yLabel, "Y");
+    m_yAttachment.reset(new juce::SliderParameterAttachment(*m_tree.getParameter("Y"), m_ySlider));
+    LF::instantiateHorizontalSlider(this, &m_zSlider, &m_zLabel, "Z");
+    m_zAttachment.reset(new juce::SliderParameterAttachment(*m_tree.getParameter("Z"), m_zSlider));
 
-    helpBlock.setReadOnly(true);
-    addAndMakeVisible(&helpBlock);
-    distortionCoefficientLabel.setJustificationType(juce::Justification::centredTop);
-    distortionCoefficientLabel.setText("Distortion Coefficient", juce::dontSendNotification);
-    addAndMakeVisible(&distortionCoefficientLabel);
-    distortionCoefficientSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBar);
-    distortionCoefficientSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    coeffAttachment.reset(new juce::SliderParameterAttachment(*tree.getParameter("D"), distortionCoefficientSlider));
-    addAndMakeVisible(&distortionCoefficientSlider);
-
-    zLabel.setJustificationType(juce::Justification::centredTop);
-    zLabel.setText("Z", juce::dontSendNotification);
-    addAndMakeVisible(&zLabel);
-    zSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBar);
-    zSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    addAndMakeVisible(&zSlider);
-    zAttachment.reset(new juce::SliderParameterAttachment(*tree.getParameter("Z"), zSlider));
     setWantsKeyboardFocus(true);
 }
 
 TransferAudioProcessorEditor::~TransferAudioProcessorEditor()
 {
-    expressionInput.setLookAndFeel(nullptr);
-    expressionInput.setLookAndFeel(nullptr);
+    m_expressionInput.setLookAndFeel(nullptr);
+    m_expressionInput.setLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
 }
 
 void TransferAudioProcessorEditor::onLabelButtonClicked(LabelButton* l)
 {
-    if (l == &graphButton)
+    if (l == &m_registerClearButton) {
+        m_audioProcessor.clearRegisters();
+        m_graphing.clearRegisters();
+    }
+    else if (l == &m_graphButton)
     {
-        graphing.setVisible(true);
-        gatePanel.setVisible(false);
-        filterPanel.setVisible(false);
-        if (!tree.state.getChildWithName("Internal").isValid()) {
+        m_graphing.setVisible(true);
+        m_gatePanel.setVisible(false);
+        m_filterPanel.setVisible(false);
+        if (!m_tree.state.getChildWithName("Internal").isValid()) {
             juce::Identifier ident("Internal");
             juce::ValueTree internalTree(ident);
-            tree.state.addChild(internalTree, -1, nullptr);
-            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(0), nullptr);
+            m_tree.state.addChild(internalTree, -1, nullptr);
+            m_tree.state.getChildWithName("Internal").setProperty("Page", juce::var(0), nullptr);
         }
         else {
-            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(0), nullptr);
+            m_tree.state.getChildWithName("Internal").setProperty("Page", juce::var(0), nullptr);
         }
     }
-    else if(l == &gateButton){
-        graphing.setVisible(false);
-        gatePanel.setVisible(true);
-        filterPanel.setVisible(false);
-        if (!tree.state.getChildWithName("Internal").isValid()) {
+    else if(l == &m_gateButton){
+        m_graphing.setVisible(false);
+        m_gatePanel.setVisible(true);
+        m_filterPanel.setVisible(false);
+        if (!m_tree.state.getChildWithName("Internal").isValid()) {
             juce::Identifier ident("Internal");
             juce::ValueTree internalTree(ident);
-            tree.state.addChild(internalTree, -1, nullptr);
-            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(1), nullptr);
+            m_tree.state.addChild(internalTree, -1, nullptr);
+            m_tree.state.getChildWithName("Internal").setProperty("Page", juce::var(1), nullptr);
         }
         else {
-            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(1), nullptr);
+            m_tree.state.getChildWithName("Internal").setProperty("Page", juce::var(1), nullptr);
         }
     }
-    else if (l == &filterButton) {
-        graphing.setVisible(false);
-        gatePanel.setVisible(false);
-        filterPanel.setVisible(true);
-        if (!tree.state.getChildWithName("Internal").isValid()) {
+    else if (l == &m_filterButton) {
+        m_graphing.setVisible(false);
+        m_gatePanel.setVisible(false);
+        m_filterPanel.setVisible(true);
+        if (!m_tree.state.getChildWithName("Internal").isValid()) {
             juce::Identifier ident("Internal");
             juce::ValueTree internalTree(ident);
-            tree.state.addChild(internalTree, -1, nullptr);
-            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(2), nullptr);
+            m_tree.state.addChild(internalTree, -1, nullptr);
+            m_tree.state.getChildWithName("Internal").setProperty("Page", juce::var(2), nullptr);
         }
         else {
-            tree.state.getChildWithName("Internal").setProperty("Page", juce::var(2), nullptr);
+            m_tree.state.getChildWithName("Internal").setProperty("Page", juce::var(2), nullptr);
         }
     }
 }
+
 
 //==============================================================================
 void TransferAudioProcessorEditor::paint (juce::Graphics& g)
@@ -229,18 +197,24 @@ void TransferAudioProcessorEditor::paint (juce::Graphics& g)
 void TransferAudioProcessorEditor::resized()
 {
     auto h = getHeight() / 10;
-    expressionLabel.setBounds(0, h / 5, getWidth(), h / 2);
-    yLabel.setBounds(0, h, getWidth() / 16, h / 2);
-    expressionInput.setBounds(getWidth() / 16, h, (getWidth() - yLabel.getWidth()) - 10, h / 4);
-    helpBlock.setBounds(0, h*1.5, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
-    graphing.setBounds(getWidth() / 2 , (h*1.5) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
-    gatePanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
-    filterPanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
-    graphButton.setBounds(graphing.getX() - getWidth() / 10, graphing.getY(), getWidth() / 10 - 1, getHeight() / 15);
-    gateButton.setBounds(graphButton.getX(), graphButton.getY() + graphButton.getHeight() + 2, graphButton.getWidth(), graphButton.getHeight());
-    filterButton.setBounds(gateButton.getX(), gateButton.getY() + gateButton.getHeight() + 2, gateButton.getWidth(), gateButton.getHeight());
-    distortionCoefficientLabel.setBounds(0, getHeight() - (h * 1.5), getWidth() / 4, h );
-    distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 1.5), (getWidth() - getWidth() / 4) - 10, h / 4);
-    zLabel.setBounds(0, getHeight() - h, getWidth() / 4, h);
-    zSlider.setBounds(getWidth() / 4, getHeight() - h, (getWidth() - getWidth() / 4) - 10, h / 4);
+    m_expressionLabel.setBounds(0, h / 5, getWidth(), h / 2);
+    m_hxLabel.setBounds(0, h, getWidth() / 16, h / 2);
+    m_expressionInput.setBounds(getWidth() / 16, h, (getWidth() - m_hxLabel.getWidth()) - 10, h / 4);
+    m_helpBlock.setBounds(0, h*1.5, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
+    m_graphing.setBounds(getWidth() / 2 , (h*1.5) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
+    m_gatePanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
+    m_filterPanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
+    m_registerClearButton.setBounds(m_graphing.getX(), m_graphing.getY() + m_graphing.getHeight(), m_graphing.getWidth() / 4, h / 4);
+    m_graphButton.setBounds(m_graphing.getX() - getWidth() / 10, m_graphing.getY(), getWidth() / 10 - 1, getHeight() / 15);
+    m_gateButton.setBounds(m_graphButton.getX(), m_graphButton.getY() + m_graphButton.getHeight() + 2, m_graphButton.getWidth(), m_graphButton.getHeight());
+    m_filterButton.setBounds(m_gateButton.getX(), m_gateButton.getY() + m_gateButton.getHeight() + 2, m_gateButton.getWidth(), m_gateButton.getHeight());
+
+    // three sliders at the bottom, so remaining height is height - h / 3.. 
+    int remainingHeight = getHeight() - (h / 3);
+    m_distortionCoefficientLabel.setBounds(0, getHeight() - (h * 1.5), getWidth() / 4, h );
+    m_distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 1.5), (getWidth() - getWidth() / 4) - 10, h / 4);
+    m_yLabel.setBounds(0, getHeight() - h, getWidth() / 4, h);
+    m_ySlider.setBounds(getWidth() / 4, getHeight() - h, (getWidth() - getWidth() / 4) - 10, h / 4);
+    m_zLabel.setBounds(0, getHeight() - (h / 3), getWidth() / 4, h);
+    m_zSlider.setBounds(getWidth() / 4, getHeight() - (h / 3), (getWidth() - getWidth() / 4) - 10, h / 4);
 }

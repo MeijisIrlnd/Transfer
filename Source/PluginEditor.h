@@ -30,27 +30,21 @@ public:
     void onLabelButtonClicked(LabelButton* l) override;
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
-    juce::AudioProcessorValueTreeState& tree;
-    TitleLF titleLF;
-    InputLF inputLF;
-    juce::Label expressionLabel;
-    juce::TextEditor expressionInput, yLabel;
-    juce::TextEditor helpBlock;
+    juce::AudioProcessorValueTreeState& m_tree;
+    TitleLF m_titleLF;
+    InputLF m_inputLF;
+    juce::Label m_expressionLabel;
+    juce::TextEditor m_expressionInput, m_hxLabel;
+    juce::TextEditor m_helpBlock;
     
-    juce::Label distortionCoefficientLabel, zLabel;
-    juce::Slider distortionCoefficientSlider, zSlider;
-    std::unique_ptr<juce::SliderParameterAttachment> coeffAttachment, zAttachment;
-    TransferAudioProcessor& audioProcessor;
-    LF lookAndFeel;
-#if defined USE_EXPRTK
-    Graphing<double> graphing;
-#else
-    Graphing graphing;
-#endif
-    GatePanel gatePanel;
-    Transfer::UI::FilterPanel filterPanel;
-    LabelButton filterButton, graphButton, gateButton;
+    juce::Label m_distortionCoefficientLabel, m_yLabel, m_zLabel;
+    juce::Slider m_distortionCoefficientSlider, m_ySlider, m_zSlider;
+    std::unique_ptr<juce::SliderParameterAttachment> m_coeffAttachment, m_yAttachment, m_zAttachment;
+    TransferAudioProcessor& m_audioProcessor;
+    LF m_lookAndFeel;
+    Graphing<double> m_graphing;
+    GatePanel m_gatePanel;
+    Transfer::UI::FilterPanel m_filterPanel;
+    LabelButton m_filterButton, m_graphButton, m_gateButton, m_registerClearButton;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransferAudioProcessorEditor)
 };
