@@ -27,7 +27,6 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     addAndMakeVisible(&m_graphing);
     m_expressionInput.setLookAndFeel(&m_inputLF);
     m_expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
-
     m_expressionInput.setFont(m_lookAndFeel.getFont());
 
     std::string ipText = m_tree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
@@ -232,4 +231,11 @@ void TransferAudioProcessorEditor::resized()
     m_ySlider.setBounds(getWidth() / 4, getHeight() - h, (getWidth() - getWidth() / 4) - 10, h / 4);
     m_zLabel.setBounds(0, getHeight() - (h / 2), getWidth() / 4, h);
     m_zSlider.setBounds(getWidth() / 4, getHeight() - (h / 2), (getWidth() - getWidth() / 4) - 10, h / 4);
+}
+
+void TransferAudioProcessorEditor::contextChangedInternal(const std::string& newText)
+{
+    m_expressionInput.setText(newText, juce::dontSendNotification);
+    // manually call graphing's update 
+    m_graphing.updateExpr(newText);
 }

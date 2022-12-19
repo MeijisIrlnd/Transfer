@@ -26,7 +26,7 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
-
+    void contextChangedInternal(const std::string& newText);
     void onLabelButtonClicked(LabelButton* l) override;
 
 private:

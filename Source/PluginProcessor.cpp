@@ -196,6 +196,11 @@ void TransferAudioProcessor::setStateInformation (const void* data, int sizeInBy
     }
     std::string transferStr = parameterTree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
     setContext(transferStr);
+    // if the UI exists, update its context too...
+    if (getActiveEditor() != nullptr) {
+        TransferAudioProcessorEditor* e = dynamic_cast<TransferAudioProcessorEditor*>(getActiveEditor());
+        e->contextChangedInternal(transferStr);
+    }
  }
 
 //==============================================================================
