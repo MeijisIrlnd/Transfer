@@ -45,6 +45,6 @@ private:
     Graphing<double> m_graphing;
     GatePanel m_gatePanel;
     Transfer::UI::FilterPanel m_filterPanel;
-    LabelButton m_filterButton, m_graphButton, m_gateButton, m_registerClearButton;
+    LabelButton m_filterButton, m_graphButton, m_gateButton, m_registerClearButton, m_panicButton;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransferAudioProcessorEditor)
 };

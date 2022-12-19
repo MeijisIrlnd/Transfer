@@ -252,7 +252,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout TransferAudioProcessor::crea
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"Ratio", 1}, "Ratio", 1.5f, 20, 2));
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"Attack", 1}, "Attack", juce::NormalisableRange<float>(1e-5f, 0.5f, 1e-5f), 1e-5f));
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"Release", 1}, "Release", juce::NormalisableRange<float>(1e-5f, 0.5f, 1e-5f), 1e-5f));
-    layout.add(std::make_unique<ChoiceParam>(juce::ParameterID{"EmphasisFilterType", 1}, "EmphasisFilterType", juce::StringArray("Low Shelf", "High Shelf"), 0));
+    layout.add(std::make_unique<ChoiceParam>(juce::ParameterID{"EmphasisFilterType", 1}, "EmphasisFilterType", juce::StringArray("Low Shelf", "High Shelf", "Peak"), 0));
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"EmphasisFilterCutoff", 1}, "EmphasisFilterCutoff", juce::NormalisableRange<float>(20, 20000, 0.01f, 0.5f), 1000));
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"EmphasisFilterSlope", 1}, "EmphasisFilterSlope", juce::NormalisableRange<float>(0.01f, 1, 0.01f), 0.5f));
     layout.add(std::make_unique<FloatParam>(juce::ParameterID{"EmphasisFilterGain", 1}, "EmphasisFilterGain", juce::NormalisableRange<float>(-12, 12, 0.01f), 0.0f));

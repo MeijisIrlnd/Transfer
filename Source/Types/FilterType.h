@@ -14,6 +14,7 @@ namespace Transfer
     enum class FILTER_TYPE
     {
         LOWSHELF, 
-        HIGHSHELF
+        HIGHSHELF,
+        PEAK
     };
 }

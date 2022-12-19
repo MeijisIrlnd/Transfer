@@ -41,7 +41,7 @@ namespace Transfer::Audio
         int m_samplesUntilUpdate = 0;
         Transfer::FILTER_TYPE m_type { FILTER_TYPE::LOWSHELF };
         double m_sampleRate;
-        double m_cutoff{ 1000 }, m_q{ 0.5 }, m_bandwidth{ 2 }, m_slope{0.7}, m_gainDB{0};
+        double m_cutoff{ 1000 }, m_q{ 0.5 }, m_bandwidth{ 2 }, m_slope{ 0.7 }, m_gainDB{ 0 };
         SDSP::BiquadCascade<1> m_filter;
         SDSP::SmoothedFilterCoefficients<1> m_coeffs;
         bool m_forward{ true };

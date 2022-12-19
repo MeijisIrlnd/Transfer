@@ -96,6 +96,9 @@ namespace Transfer::Audio
                 SDSP::RBJ::highShelf(m_coeffs.target(0), m_sampleRate, m_cutoff, m_gainDB, m_slope);
                 break;
             }
+            case FILTER_TYPE::PEAK: {
+                SDSP::RBJ::bell(m_coeffs.target(0), m_sampleRate, m_gainDB, m_cutoff, 2);
+            }
             default: return;
         }
         

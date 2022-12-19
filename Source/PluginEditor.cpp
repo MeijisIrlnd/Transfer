@@ -10,11 +10,12 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcessor& p, juce::AudioProcessorValueTreeState& t)
-    : AudioProcessorEditor (&p), m_audioProcessor (p), m_tree(t), m_gatePanel(m_tree), m_filterPanel(m_tree), m_filterButton("Filter", juce::Colour(200, 200, 200), true), 
+TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcessor& p, juce::AudioProcessorValueTreeState& t)
+    : AudioProcessorEditor(&p), m_audioProcessor(p), m_tree(t), m_gatePanel(m_tree), m_filterPanel(m_tree), m_filterButton("Filter", juce::Colour(200, 200, 200), true),
     m_graphButton("Graph", juce::Colour(200, 200, 200), true),
     m_gateButton("Gate", juce::Colour(200, 200, 200), true),
     m_registerClearButton("CLR GPR", juce::Colour(200, 200, 200), true),
+    m_panicButton("PANIC", juce::Colour(200, 200, 200), true),
     m_graphing(m_tree)
 {
     setSize (800, 1000);
@@ -36,6 +37,9 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     auto dParam = m_tree.getParameter("D");
     auto dv = dParam->getNormalisableRange().convertFrom0to1(dParam->getValue());
     m_graphing.setDistortionCoeff(dv);
+    auto yParam = m_tree.getParameter("Y");
+    auto rangedY = yParam->getNormalisableRange().convertFrom0to1(yParam->getValue());
+    m_graphing.setY(rangedY);
     auto zParam = m_tree.getParameter("Z");
     auto dz = zParam->getNormalisableRange().convertFrom0to1(zParam->getValue());
     m_graphing.setZ(dz);
@@ -76,11 +80,13 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
         }
     }
     addAndMakeVisible(&m_registerClearButton);
+    addAndMakeVisible(&m_panicButton);
     addAndMakeVisible(&m_filterButton);
     addAndMakeVisible(&m_graphButton);
     addAndMakeVisible(&m_gateButton);
 
     m_registerClearButton.addListener(this);
+    m_panicButton.addListener(this);
     m_filterButton.addListener(this);
     m_graphButton.addListener(this);
     m_gateButton.addListener(this);
@@ -97,11 +103,12 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
         catch(std::exception& e){
             //Don't
         }
+        m_expressionInput.unfocusAllComponents();
     };
     addAndMakeVisible(&m_expressionInput);
     m_helpBlock.setMultiLine(true);
     std::stringstream displayText;
-    displayText << "Variables:\nx: Input Sample\nd: distortion coefficient (0 to 10\ny: user defined (0 to 1)\nz: user defined (0 to 1)\ngpr[0...4]: general purpose registers\n\n";
+    displayText << "Variables:\nx: Input Sample\nd: distortion coefficient (0 to 10)\ny: user defined (0 to 1)\nz: user defined (0 to 1)\ngpr[0...4]: general purpose registers\n\n";
     displayText << "Logical:\nand, nand, mand, &, nor, xor, |, nor, xnor, not, \n\n";
     displayText << "General:\nabs(x), avg(x,y..), ceil(x), clamp(mn,x,mx), equal(x,y), erf(x), erfc(x), exp(x), expm1(x), floor(x), frac(x), hypot(x,y), iclamp(mn,x,mx),";
     displayText << "inrange(mn,x,mx), log(x), log10(x), log1p(x), log2(x), logn(x,n), max(x,y..), min(x,y..), mul(x,y..), ncdf(x), not_equal(x,y), pow(x,y), root(x,n),";
@@ -124,7 +131,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor (TransferAudioProcess
     LF::instantiateHorizontalSlider(this, &m_zSlider, &m_zLabel, "Z");
     m_zAttachment.reset(new juce::SliderParameterAttachment(*m_tree.getParameter("Z"), m_zSlider));
 
-    setWantsKeyboardFocus(true);
+    //setWantsKeyboardFocus(true);
 }
 
 TransferAudioProcessorEditor::~TransferAudioProcessorEditor()
@@ -140,6 +147,13 @@ void TransferAudioProcessorEditor::onLabelButtonClicked(LabelButton* l)
         m_audioProcessor.clearRegisters();
         m_graphing.clearRegisters();
     }
+
+    else if (l == &m_panicButton) {
+        // Set transfer to 0, and invoke all callbacks..
+        m_expressionInput.setText("x", juce::sendNotification);
+        m_expressionInput.onReturnKey();
+    }
+
     else if (l == &m_graphButton)
     {
         m_graphing.setVisible(true);
@@ -205,6 +219,7 @@ void TransferAudioProcessorEditor::resized()
     m_gatePanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
     m_filterPanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
     m_registerClearButton.setBounds(m_graphing.getX(), m_graphing.getY() + m_graphing.getHeight(), m_graphing.getWidth() / 4, h / 4);
+    m_panicButton.setBounds(m_registerClearButton.getX() + m_registerClearButton.getWidth(), m_registerClearButton.getY(), m_registerClearButton.getWidth(), m_registerClearButton.getHeight());
     m_graphButton.setBounds(m_graphing.getX() - getWidth() / 10, m_graphing.getY(), getWidth() / 10 - 1, getHeight() / 15);
     m_gateButton.setBounds(m_graphButton.getX(), m_graphButton.getY() + m_graphButton.getHeight() + 2, m_graphButton.getWidth(), m_graphButton.getHeight());
     m_filterButton.setBounds(m_gateButton.getX(), m_gateButton.getY() + m_gateButton.getHeight() + 2, m_gateButton.getWidth(), m_gateButton.getHeight());
@@ -215,6 +230,6 @@ void TransferAudioProcessorEditor::resized()
     m_distortionCoefficientSlider.setBounds(getWidth() / 4, getHeight() - (h * 1.5), (getWidth() - getWidth() / 4) - 10, h / 4);
     m_yLabel.setBounds(0, getHeight() - h, getWidth() / 4, h);
     m_ySlider.setBounds(getWidth() / 4, getHeight() - h, (getWidth() - getWidth() / 4) - 10, h / 4);
-    m_zLabel.setBounds(0, getHeight() - (h / 3), getWidth() / 4, h);
-    m_zSlider.setBounds(getWidth() / 4, getHeight() - (h / 3), (getWidth() - getWidth() / 4) - 10, h / 4);
+    m_zLabel.setBounds(0, getHeight() - (h / 2), getWidth() / 4, h);
+    m_zSlider.setBounds(getWidth() / 4, getHeight() - (h / 2), (getWidth() - getWidth() / 4) - 10, h / 4);
 }

@@ -14,11 +14,12 @@
 
 namespace Transfer::UI
 {
-    class FilterPanel : public juce::Component
+    class FilterPanel : public juce::Component, public APVTS::Listener
     {
     public: 
         FilterPanel(APVTS& tree);
         ~FilterPanel() override;
+        void parameterChanged(const juce::String& id, float value) override;
         void paint(juce::Graphics& g) override;
         void resized() override;
         void instantiateSlider(juce::Slider* s, juce::Label* l, std::string labelText, std::string units = "");

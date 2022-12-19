@@ -14,7 +14,7 @@ namespace Transfer::UI
 {
     FilterPanel::FilterPanel(APVTS& tree) : m_tree(tree)
     {
-        instantiateComboBox(&m_filterTypeSelector, &m_filterTypeLabel, { "Low Shelf", "High Shelf" }, "Filter Type");
+        instantiateComboBox(&m_filterTypeSelector, &m_filterTypeLabel, { "Low Shelf", "High Shelf", "Peak"}, "Filter Type");
         m_filterTypeAttachment.reset(new juce::ComboBoxParameterAttachment(*tree.getParameter("EmphasisFilterType"), m_filterTypeSelector));
         instantiateSlider(&m_filterCutoffSlider, &m_filterCutoffLabel, "Cutoff", "Hz");
         m_cutoffAttachment.reset(new juce::SliderParameterAttachment(*tree.getParameter("EmphasisFilterCutoff"), m_filterCutoffSlider));
@@ -22,10 +22,21 @@ namespace Transfer::UI
         m_slopeAttachment.reset(new juce::SliderParameterAttachment(*tree.getParameter("EmphasisFilterSlope"), m_filterSlopeSlider));
         instantiateSlider(&m_filterGainSlider, &m_filterGainLabel, "Gain", "dB");
         m_gainAttachment.reset(new juce::SliderParameterAttachment(*tree.getParameter("EmphasisFilterGain"), m_filterGainSlider));
+        tree.addParameterListener("EmphasisFilterType", this);
+        parameterChanged("EmphasisFilterType", m_tree.getParameterRange("EmphasisFilterType").convertFrom0to1(tree.getParameter("EmphasisFilterType")->getValue()));
     }
 
     FilterPanel::~FilterPanel()
     {
+        m_tree.removeParameterListener("EmphasisFilterType", this);
+    }
+
+    void FilterPanel::parameterChanged(const juce::String& id, float value)
+    {
+        int idx = static_cast<int>(value);
+        m_filterSlopeLabel.setVisible(idx != 2);
+        m_filterSlopeSlider.setVisible(idx != 2);
+        m_filterCutoffLabel.setText(idx == 2 ? "CF" : "Cutoff", juce::dontSendNotification);
     }
 
     void FilterPanel::paint(juce::Graphics& g)
@@ -41,10 +52,14 @@ namespace Transfer::UI
         m_filterTypeSelector.setBounds(getWidth() / 4, getHeight() / 8 + 1, getWidth() - getWidth() / 4 - 1, getHeight() / 10);
         m_filterCutoffLabel.setBounds(0, getHeight() / 4 + 1 + getHeight() / 8, getWidth() / 4, getHeight() / 10);
         m_filterCutoffSlider.setBounds(getWidth() / 4, m_filterCutoffLabel.getY(), getWidth() - getWidth() / 4 - 1, getHeight() / 10);
-        m_filterSlopeLabel.setBounds(0, getHeight() / 2 + 1 + getHeight() / 8, getWidth() / 4, getHeight() / 10);
-        m_filterSlopeSlider.setBounds(getWidth() / 4, m_filterSlopeLabel.getY(), getWidth() - getWidth() / 4 - 1, getHeight() / 10);
-        m_filterGainLabel.setBounds(0, (getHeight() / 4) * 3 + 1 + getHeight() / 8, getWidth() / 4, getHeight() / 10);
+
+        //m_filterGainLabel.setBounds(0, (getHeight() / 4) * 3 + 1 + getHeight() / 8, getWidth() / 4, getHeight() / 10);
+        m_filterGainLabel.setBounds(0, getHeight() / 2 + 1 + getHeight() / 8, getWidth() / 4, getHeight() / 10);
         m_filterGainSlider.setBounds(getWidth() / 4, m_filterGainLabel.getY(), getWidth() - getWidth() / 4 - 1, getHeight() / 10);
+
+        //m_filterSlopeLabel.setBounds(0, getHeight() / 2 + 1 + getHeight() / 8, getWidth() / 4, getHeight() / 10);
+        m_filterSlopeLabel.setBounds(0, (getHeight() / 4) * 3 + 1 + getHeight() / 8, getWidth() / 4, getHeight() / 10);
+        m_filterSlopeSlider.setBounds(getWidth() / 4, m_filterSlopeLabel.getY(), getWidth() - getWidth() / 4 - 1, getHeight() / 10);
     }
 
     void FilterPanel::instantiateSlider(juce::Slider* s, juce::Label* l, std::string labelText, std::string units)
