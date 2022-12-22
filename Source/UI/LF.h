@@ -41,7 +41,7 @@ public:
     juce::Font getComboBoxFont(juce::ComboBox& source) override { return font.withHeight(source.getHeight()); }
     juce::Font getPopupMenuFont() override { return font; }
     juce::Font& getFont() { return font; }
-
+    static inline juce::Font createFont() { return juce::Typeface::createSystemTypefaceFor(BinaryData::DroidSansMono_ttf, BinaryData::DroidSansMono_ttfSize); }
     static inline void instantiateHorizontalSlider(juce::Component* parent, juce::Slider* s, juce::Label* l, const juce::String& labelText)
     {
         l->setJustificationType(juce::Justification::centredTop);
@@ -66,7 +66,7 @@ public:
 
     ~TitleLF() override { }
     juce::Font getLabelFont(juce::Label& label) override { 
-        return juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::WetdreamzmediumLYxZ_otf, BinaryData::WetdreamzmediumLYxZ_otfSize)).withHeight(label.getHeight());
+        return juce::Font(LF::createFont().withHeight(label.getHeight()));
     }
 };
 

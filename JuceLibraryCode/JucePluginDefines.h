@@ -44,16 +44,16 @@
  #define JucePlugin_Name                   "Transfer"
 #endif
 #ifndef  JucePlugin_Desc
- #define JucePlugin_Desc                   "KCU001"
+ #define JucePlugin_Desc                   "SM001"
 #endif
 #ifndef  JucePlugin_Manufacturer
  #define JucePlugin_Manufacturer           "Syl Morrison"
 #endif
 #ifndef  JucePlugin_ManufacturerWebsite
- #define JucePlugin_ManufacturerWebsite    "https://kalidemusic.com"
+ #define JucePlugin_ManufacturerWebsite    "https://meijisirlnd.github.io"
 #endif
 #ifndef  JucePlugin_ManufacturerEmail
- #define JucePlugin_ManufacturerEmail      ""
+ #define JucePlugin_ManufacturerEmail      "syl.morrison.dev@gmail.com"
 #endif
 #ifndef  JucePlugin_ManufacturerCode
  #define JucePlugin_ManufacturerCode       0x4d616e75
@@ -77,13 +77,13 @@
  #define JucePlugin_EditorRequiresKeyboardFocus  1
 #endif
 #ifndef  JucePlugin_Version
- #define JucePlugin_Version                1.0.0
+ #define JucePlugin_Version                0.0.1
 #endif
 #ifndef  JucePlugin_VersionCode
- #define JucePlugin_VersionCode            0x10000
+ #define JucePlugin_VersionCode            0x1
 #endif
 #ifndef  JucePlugin_VersionString
- #define JucePlugin_VersionString          "1.0.0"
+ #define JucePlugin_VersionString          "0.0.1"
 #endif
 #ifndef  JucePlugin_VSTUniqueID
  #define JucePlugin_VSTUniqueID            JucePlugin_PluginCode
