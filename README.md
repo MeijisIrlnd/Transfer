@@ -1,6 +1,6 @@
 # Transfer
 #### because normal distortions are boring
-![image](https://user-images.githubusercontent.com/38221014/208338988-e1f930d7-459f-4105-a5b0-d04bb49b298b.png)
+![image](https://user-images.githubusercontent.com/38221014/210483486-0d4fb6f0-b8e3-4efa-83a4-afd8b2d7dabe.png)
 ## about 
 Transfer is a waveshaper based distortion, except the transfer function is JIT compiled from text inputted by the user. Starting as a tool for testing different transfer functions in other projects, it has evolved into a pretty cool and unique plugin (<i>disclaimer it might not be that unique I have done absolutely no market research whatsoever)</i>. It also has a built in gate, and an emphasis filter, which applies the filters to the signal pre waveshaping, then applies the exact opposite filter post waveshaping.
 
@@ -12,6 +12,11 @@ As is the nature of something like this, it's pretty easy to annihilate your hea
 
 ## crashes 
 as far as i can tell, most of the obvious crashes are sorted (checking for nan / inf, division by zero, all the boring stuff), but if you find anything spicy that crashes it do let me know. if you type in an expression which can't compile, it'll just revert to linear (`H(s) = x`), and if it finds nans or infs or -nans or -infs, it zeroes them.
+
+## roadmap 
+- <s>resizable</s>
+- syntax highlighting of some way shape or form, starting with brace pairs
+- ???
 
 ## starting points
 sigmoid functions tend to be a nice starting point, [the wikipedia article for them](https://en.wikipedia.org/wiki/Sigmoid_function) has a bunch of examples. some functions i've been using to test, though, are:
