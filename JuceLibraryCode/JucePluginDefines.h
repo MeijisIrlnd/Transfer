@@ -155,7 +155,7 @@
  #define JucePlugin_ARAFactoryID           "com.SylMorrison.Transfer.factory"
 #endif
 #ifndef  JucePlugin_ARADocumentArchiveID
- #define JucePlugin_ARADocumentArchiveID   "com.SylMorrison.Transfer.aradocumentarchive.1.0.0"
+ #define JucePlugin_ARADocumentArchiveID   "com.SylMorrison.Transfer.aradocumentarchive.0.0.1"
 #endif
 #ifndef  JucePlugin_ARACompatibleArchiveIDs
  #define JucePlugin_ARACompatibleArchiveIDs  ""

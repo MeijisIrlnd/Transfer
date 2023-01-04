@@ -18,7 +18,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     m_panicButton("PANIC", juce::Colour(200, 200, 200), true),
     m_graphing(m_tree)
 {
-    setSize (800, 1000);
+    setSize (600, 600 * 1.25);
     m_expressionLabel.setLookAndFeel(&m_titleLF);
     m_expressionLabel.setFont(m_titleLF.getLabelFont(m_expressionLabel));
     m_expressionLabel.setJustificationType(juce::Justification::centred);
@@ -45,8 +45,8 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
 
     addAndMakeVisible(&m_expressionLabel);
 
-    m_hxLabel.setColour(juce::TextEditor::textColourId, juce::Colours::black);
-    m_hxLabel.setReadOnly(true);
+    
+    m_hxLabel.setColour(juce::TextEditor::textColourId, juce::Colour(0xFF7F7F7F));
     m_hxLabel.setText("H(s)=", juce::dontSendNotification);
     m_hxLabel.setFont(m_lookAndFeel.getFont());
 
@@ -106,22 +106,22 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     };
     addAndMakeVisible(&m_expressionInput);
     m_helpBlock.setMultiLine(true);
-    std::stringstream displayText;
-    displayText << "Variables:\nx: Input Sample\nd: distortion coefficient (0 to 10)\ny: user defined (0 to 1)\nz: user defined (0 to 1)\ngpr[0...4]: general purpose registers\n\n";
-    displayText << "Logical:\nand, nand, mand, &, nor, xor, |, nor, xnor, not, \n\n";
-    displayText << "General:\nabs(x), avg(x,y..), ceil(x), clamp(mn,x,mx), equal(x,y), erf(x), erfc(x), exp(x), expm1(x), floor(x), frac(x), hypot(x,y), iclamp(mn,x,mx),";
-    displayText << "inrange(mn,x,mx), log(x), log10(x), log1p(x), log2(x), logn(x,n), max(x,y..), min(x,y..), mul(x,y..), ncdf(x), not_equal(x,y), pow(x,y), root(x,n),";
-    displayText << "round(x), roundn(x,n), sgn(x), sqrt(x), sum(x,y..), swap(x,y), trunc(x)\n\n";
-    displayText << "Trig:\nsin(x), cos(x), tan(x), asin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x), asinh(x), acosh(x), atanh(x), atan2(x,y), sinc(x), sec(x), cot(x), csc(x), deg2rad(x),";
-    displayText << "deg2grad(x), rad2deg(x), grad2deg(x)\n\n";
-    displayText << "Equalities & Operators:\n +, -, *, /, %, ^\n==, !=, <, <=, >, >=\n\n";
-    displayText << "Control Flow:\nif(x) y;, if(x) y; else z;, \nif(x) y; else if(z) a;\n\n";
-    displayText << "Assignment:\n:=, +=, -=, *=, /=, %=\n\n";
-    displayText << "~(x, y, ... n): evaluate exprs left to right, return value of last expr";
 
-    m_helpBlock.setText(displayText.str(), false);
+    m_displayText << "<b>Variables</b>:\nx: Input Sample\nd: distortion coefficient (0 to 10)\ny: user defined (0 to 1)\nz: user defined (0 to 1)\ngpr[0...4]: general purpose registers\n\n";
+    m_displayText << "Logical:\nand, nand, mand, &, nor, xor, |, nor, xnor, not, \n\n";
+    m_displayText << "General:\nabs(x), avg(x,y..), ceil(x), clamp(mn,x,mx), equal(x,y), erf(x), erfc(x), exp(x), expm1(x), floor(x), frac(x), hypot(x,y), iclamp(mn,x,mx),";
+    m_displayText << "inrange(mn,x,mx), log(x), log10(x), log1p(x), log2(x), logn(x,n), max(x,y..), min(x,y..), mul(x,y..), ncdf(x), not_equal(x,y), pow(x,y), root(x,n),";
+    m_displayText << "round(x), roundn(x,n), sgn(x), sqrt(x), sum(x,y..), swap(x,y), trunc(x)\n\n";
+    m_displayText << "Trig:\nsin(x), cos(x), tan(x), asin(x), acos(x), atan(x), sinh(x), cosh(x), tanh(x), asinh(x), acosh(x), atanh(x), atan2(x,y), sinc(x), sec(x), cot(x), csc(x), deg2rad(x),";
+    m_displayText << "deg2grad(x), rad2deg(x), grad2deg(x)\n\n";
+    m_displayText << "Equalities & Operators:\n +, -, *, /, %, ^\n==, !=, <, <=, >, >=\n\n";
+    m_displayText << "Control Flow:\nif(x) y;, if(x) y; else z;, \nif(x) y; else if(z) a;\n\n";
+    m_displayText << "Assignment:\n:=, +=, -=, *=, /=, %=\n\n";
+    m_displayText << "~(x, y, ... n): evaluate exprs left to right, return value of last expr";
 
+    m_helpBlock.setText(m_displayText.str(), false);
     m_helpBlock.setReadOnly(true);
+    m_helpBlock.setScrollbarsShown(false);
     addAndMakeVisible(&m_helpBlock);
     LF::instantiateHorizontalSlider(this, &m_distortionCoefficientSlider, &m_distortionCoefficientLabel, "Distortion Coefficient");
     m_coeffAttachment.reset(new juce::SliderParameterAttachment(*m_tree.getParameter("D"), m_distortionCoefficientSlider));
@@ -129,8 +129,9 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     m_yAttachment.reset(new juce::SliderParameterAttachment(*m_tree.getParameter("Y"), m_ySlider));
     LF::instantiateHorizontalSlider(this, &m_zSlider, &m_zLabel, "Z");
     m_zAttachment.reset(new juce::SliderParameterAttachment(*m_tree.getParameter("Z"), m_zSlider));
-
+    addAndMakeVisible(&m_sizeButtons);
     //setWantsKeyboardFocus(true);
+    resized();
 }
 
 TransferAudioProcessorEditor::~TransferAudioProcessorEditor()
@@ -211,9 +212,11 @@ void TransferAudioProcessorEditor::resized()
 {
     auto h = getHeight() / 10;
     m_expressionLabel.setBounds(0, h / 5, getWidth(), h / 2);
-    m_hxLabel.setBounds(0, h, getWidth() / 16, h / 2);
+    m_sizeButtons.setBounds(getWidth() - getWidth() / 5, 0, getWidth() / 5, h / 4);
+    m_hxLabel.setBounds(0, h, getWidth() / 16, h / 4);
     m_expressionInput.setBounds(getWidth() / 16, h, (getWidth() - m_hxLabel.getWidth()) - 10, h / 4);
-    m_helpBlock.setBounds(0, h*1.5, getWidth()/2 - getWidth() / 10 - 1 , getHeight() - h*3);
+    m_helpBlock.setBounds(0, h * 1.5, getWidth() / 2 - getWidth() / 10 - 1 , getHeight() - h*3);
+    m_helpBlock.applyFontToAllText(LF::createFont().withHeight(m_helpBlock.getHeight() / 50.0f));
     m_graphing.setBounds(getWidth() / 2 , (h*1.5) + 10, getWidth() / 2, (getHeight() - h*4) - 20);
     m_gatePanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
     m_filterPanel.setBounds(getWidth() / 2, (h * 1.5) + 10, getWidth() / 2, (getHeight() - h * 4) - 20);
@@ -238,4 +241,43 @@ void TransferAudioProcessorEditor::contextChangedInternal(const std::string& new
     m_expressionInput.setText(newText, juce::dontSendNotification);
     // manually call graphing's update 
     m_graphing.updateExpr(newText);
+}
+
+TransferAudioProcessorEditor::SizeController::SizeController() : m_smallButton("S", juce::Colour(0x7F232323), true),
+    m_mediumButton("M", juce::Colour(0x7F232323), true),
+    m_largeButton("L", juce::Colour(0x7F232323), true),
+    m_buttons({&m_smallButton, &m_mediumButton, &m_largeButton}),
+    m_sizeOpts({std::tuple<int, int>{600, 600 * 1.25}, std::tuple<int, int>{700, 700 * 1.25}, std::tuple<int, int>{800, 800 * 1.25}})
+{
+    for (auto& b : m_buttons) {
+        addAndMakeVisible(b);
+        b->addListener(this);
+    }
+}
+
+TransferAudioProcessorEditor::SizeController::~SizeController()
+{
+}
+
+void TransferAudioProcessorEditor::SizeController::paint(juce::Graphics& g)
+{
+    //g.fillAll(juce::Colour(0x7F232323));
+}
+
+void TransferAudioProcessorEditor::SizeController::resized()
+{
+    auto w = getWidth() / 4;
+    m_sizeLabel.setBounds(0, 0, getWidth() / 4, getHeight());
+    for (auto i = 0; i < m_buttons.size(); i++) {
+        m_buttons[i]->setBounds(m_sizeLabel.getX() + (w * (i + 1)), m_sizeLabel.getY(), w, getHeight());
+    }
+}
+
+void TransferAudioProcessorEditor::SizeController::onLabelButtonClicked(LabelButton* l)
+{
+    auto it = std::find(m_buttons.begin(), m_buttons.end(), l);
+    if (it == m_buttons.end()) return;
+    auto [width, height] = m_sizeOpts[std::distance(m_buttons.begin(), it)];
+    getParentComponent()->setSize(width, height);
+    
 }

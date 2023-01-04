@@ -185,6 +185,7 @@ public:
     void resized() override
     {
         numPixels = getWidth();
+        recalculate();
     }
 
 private:
