@@ -45,10 +45,10 @@ namespace Transfer::Audio
             for (auto channel = 0; channel < block.getNumChannels(); channel++) {
                 auto* buffer = block.getChannelPointer(channel);
                 float current = m_gateState ? m_gates[channel].processSample(buffer[sample]) : buffer[sample];
-                //current = m_forwardEmphasisFilters[channel].processSample(current);
+                current = m_forwardEmphasisFilters[channel].processSample(current);
                 current = m_waveshaper.processSample(current);
                 current = isnan(current) ? 0.0f : (isinf(current) ? 0.0f : current);
-                //current = m_backwardEmphasisFilters[channel].processSample(current);
+                current = m_backwardEmphasisFilters[channel].processSample(current);
                 buffer[sample] = current;
             }
         }
