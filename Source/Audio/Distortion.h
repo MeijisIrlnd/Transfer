@@ -21,7 +21,7 @@ namespace Transfer::Audio
         Distortion(juce::AudioProcessorValueTreeState& tree);
         ~Distortion() override;
         void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
-        void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
+        void getNextAudioBlock(const juce::dsp::AudioBlock<float>& block);
         void releaseResources();
 
         void parameterChanged(const juce::String& id, float newValue) override;

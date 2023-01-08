@@ -37,19 +37,19 @@ namespace Transfer::Audio
         m_prepared = true;
     }
 
-    void Distortion::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
+    void Distortion::getNextAudioBlock(const juce::dsp::AudioBlock<float>& block)
     {
-        auto* read = bufferToFill.buffer->getArrayOfReadPointers();
-        auto* write = bufferToFill.buffer->getArrayOfWritePointers();
-        for (auto sample = 0; sample < bufferToFill.numSamples; sample++) {
+
+        for (auto sample = 0; sample < block.getNumSamples(); sample++) {
             
-            for (auto channel = 0; channel < bufferToFill.buffer->getNumChannels(); channel++) {
-                float current = m_gateState ? m_gates[channel].processSample(read[channel][sample]) : read[channel][sample];
-                current = m_forwardEmphasisFilters[channel].processSample(current);
+            for (auto channel = 0; channel < block.getNumChannels(); channel++) {
+                auto* buffer = block.getChannelPointer(channel);
+                float current = m_gateState ? m_gates[channel].processSample(buffer[sample]) : buffer[sample];
+                //current = m_forwardEmphasisFilters[channel].processSample(current);
                 current = m_waveshaper.processSample(current);
                 current = isnan(current) ? 0.0f : (isinf(current) ? 0.0f : current);
-                current = m_backwardEmphasisFilters[channel].processSample(current);
-                write[channel][sample] = current;
+                //current = m_backwardEmphasisFilters[channel].processSample(current);
+                buffer[sample] = current;
             }
         }
     }

@@ -25,7 +25,8 @@ TransferAudioProcessor::TransferAudioProcessor()
 #else 
     : 
 #endif
-    parameterTree(*this, nullptr, juce::Identifier("Transfer"), createParameterLayout()), m_distortion(parameterTree)
+    parameterTree(*this, nullptr, juce::Identifier("Transfer"), createParameterLayout()), m_distortion(parameterTree),
+    m_oversampler(2, m_oversamplingFactor, juce::dsp::Oversampling<float>::filterHalfBandFIREquiripple)
 {
     //context.reset(new Expression<float>("x", 0, 0));
     context.reset(new Expression<float>("x", 0, 0));
@@ -110,7 +111,11 @@ void TransferAudioProcessor::changeProgramName (int index, const juce::String& n
 //==============================================================================
 void TransferAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    m_distortion.prepareToPlay(samplesPerBlock, sampleRate);
+    m_oversampler.reset();
+    m_oversampler.setUsingIntegerLatency(true);
+    m_oversampler.initProcessing(samplesPerBlock);
+    setLatencySamples(m_oversampler.getLatencyInSamples());
+    m_distortion.prepareToPlay(samplesPerBlock, sampleRate * m_oversamplingFactor);
 }
 
 void TransferAudioProcessor::releaseResources()
@@ -147,9 +152,10 @@ void TransferAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-    m_distortion.getNextAudioBlock(juce::AudioSourceChannelInfo{ buffer });
+    juce::dsp::AudioBlock<float> block{ buffer };
+    auto oversampled = m_oversampler.processSamplesUp(block);
+    m_distortion.getNextAudioBlock(oversampled);
+    m_oversampler.processSamplesDown(block);
 }
 
 //==============================================================================
