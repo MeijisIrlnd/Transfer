@@ -15,7 +15,7 @@
 #include <string>
 #include <functional>
 #include <SDSP/SDSP.h>
-
+#include <Utils/ErrorReporter.h>
 template <typename T>
 struct Expression
 {
@@ -53,8 +53,17 @@ struct Expression
                     return 0.0f;
                 }
             };
+            if (ErrorReporter::getInstance()->hasError()) {
+                ErrorReporter::getInstance()->clearErrors();
+            }
         }
         else {
+            std::vector<error_t> errors(parser.error_count());
+            
+            for (auto i = 0; i < parser.error_count(); i++) {
+                errors[i] = parser.get_error(i);
+            }
+            ErrorReporter::getInstance()->report(errors);
             transferFunction = [this](float x) { return x; };
         }
     }

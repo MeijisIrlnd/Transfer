@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "Expression.h"
 #include <Audio/Distortion.h>
+#include <Utils/ErrorReporter.h>
 //==============================================================================
 /**
 */

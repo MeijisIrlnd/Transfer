@@ -28,6 +28,7 @@ TransferAudioProcessor::TransferAudioProcessor()
     parameterTree(*this, nullptr, juce::Identifier("Transfer"), createParameterLayout()), m_distortion(parameterTree),
     m_oversampler(2, m_oversamplingFactor, juce::dsp::Oversampling<float>::filterHalfBandFIREquiripple)
 {
+    ErrorReporter::init();
     //context.reset(new Expression<float>("x", 0, 0));
     context.reset(new Expression<float>("x", 0, 0));
     parameterTree.addParameterListener("D", this);
@@ -37,6 +38,7 @@ TransferAudioProcessor::TransferAudioProcessor()
 
 TransferAudioProcessor::~TransferAudioProcessor()
 {
+    ErrorReporter::destroy();
 }
 
 void TransferAudioProcessor::parameterChanged(const juce::String& id, float newValue)
@@ -166,7 +168,9 @@ bool TransferAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* TransferAudioProcessor::createEditor()
 {
-    return new TransferAudioProcessorEditor (*this, parameterTree);
+    auto* editor = new TransferAudioProcessorEditor(*this, parameterTree);
+    ErrorReporter::getInstance()->setEditor(editor);
+    return editor;
 }
 
 //==============================================================================

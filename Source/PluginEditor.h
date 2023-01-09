@@ -15,10 +15,15 @@
 #include "UI/GatePanel.h"
 #include "UI/LabelButton.h"
 #include <UI/FilterPanel.h>
+
+#include <Utils/ExprtkTokeniser.h>
+#include <UI/TransferCodeEditor.h>
+#include <Utils/ErrorReporter.h>
+
 //==============================================================================
 /**
 */
-class TransferAudioProcessorEditor  : public juce::AudioProcessorEditor, public LabelButton::Listener
+class TransferAudioProcessorEditor  : public juce::AudioProcessorEditor, public LabelButton::Listener, public juce::CodeDocument::Listener
 {
 public:
     TransferAudioProcessorEditor (TransferAudioProcessor&, juce::AudioProcessorValueTreeState&);
@@ -28,8 +33,13 @@ public:
     void resized() override;
     void contextChangedInternal(const std::string& newText);
     void onLabelButtonClicked(LabelButton* l) override;
-
+    void codeDocumentTextInserted(const juce::String& newText, int insertIndex) override;
+    void codeDocumentTextDeleted(int startIndex, int endIndex) override;
+    void showError(const std::vector<error_t>& errors);
+    void clearErrors();
 private:
+    void initialiseGraphingParams();
+    void initialiseShownPanel();
     class SizeController : public juce::Component, public LabelButton::Listener
     {
     public: 
@@ -45,12 +55,15 @@ private:
         std::array<LabelButton*, 3> m_buttons;
         std::array<std::tuple<int, int>, 3> m_sizeOpts;
     } m_sizeButtons;
-
+    juce::TooltipWindow m_tooltipWindow;
     juce::AudioProcessorValueTreeState& m_tree;
     juce::ComponentBoundsConstrainer m_constrainer;
     TitleLF m_titleLF;
     InputLF m_inputLF;
     juce::Label m_expressionLabel, m_hxLabel;
+    ExprtkTokeniser m_tokeniser;
+    juce::CodeDocument m_document;
+    TransferCodeEditor m_codeEditor;
     juce::TextEditor m_expressionInput;
     juce::TextEditor m_helpBlock;
     

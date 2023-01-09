@@ -31,7 +31,7 @@ public:
         setColour(juce::PopupMenu::ColourIds::textColourId, juce::Colours::black);
         
         setColour(juce::CaretComponent::ColourIds::caretColourId, juce::Colour(0xFF7F7F7F));
-
+        setColour(juce::CodeEditorComponent::ColourIds::backgroundColourId, juce::Colour(200, 200, 200));
         font = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::DroidSansMono_ttf, BinaryData::DroidSansMono_ttfSize));
         //font = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::agreepersonaluse_regular_otf, BinaryData::agreepersonaluse_regular_otfSize));
     }
@@ -41,6 +41,26 @@ public:
     juce::Font getComboBoxFont(juce::ComboBox& source) override { return font.withHeight(source.getHeight()); }
     juce::Font getPopupMenuFont() override { return font; }
     juce::Font& getFont() { return font; }
+
+    std::unique_ptr<juce::FocusOutline> createFocusOutlineForComponent(juce::Component&) override
+    {
+        struct WindowProperties : public juce::FocusOutline::OutlineWindowProperties
+        {
+            juce::Rectangle<int> getOutlineBounds(juce::Component& c) override
+            {
+                return c.getScreenBounds();
+            }
+
+            void drawOutline(juce::Graphics& g, int width, int height) override
+            {
+                g.setColour(juce::Colour{0xFF000000});
+                g.drawRoundedRectangle({ (float)width, (float)height }, 1.0f, 1.0f);
+            }
+        };
+
+        return std::make_unique<juce::FocusOutline>(std::make_unique<WindowProperties>());
+    }
+
     static inline juce::Font createFont() { return juce::Typeface::createSystemTypefaceFor(BinaryData::DroidSansMono_ttf, BinaryData::DroidSansMono_ttfSize); }
     static inline void instantiateHorizontalSlider(juce::Component* parent, juce::Slider* s, juce::Label* l, const juce::String& labelText)
     {

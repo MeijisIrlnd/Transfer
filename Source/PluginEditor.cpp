@@ -16,35 +16,28 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     m_gateButton("Gate", juce::Colour(200, 200, 200), true),
     m_registerClearButton("CLR GPR", juce::Colour(200, 200, 200), true),
     m_panicButton("PANIC", juce::Colour(200, 200, 200), true),
-    m_graphing(m_tree)
+    m_graphing(m_tree), m_codeEditor(m_document, &m_tokeniser)
 {
     setSize (600, 600 * 1.25);
+    m_document.addListener(this);
     m_expressionLabel.setLookAndFeel(&m_titleLF);
     m_expressionLabel.setFont(m_titleLF.getLabelFont(m_expressionLabel));
     m_expressionLabel.setJustificationType(juce::Justification::centred);
     m_expressionLabel.setText("transfer", juce::dontSendNotification);
     setLookAndFeel(&m_lookAndFeel);
     addAndMakeVisible(&m_graphing);
-    m_expressionInput.setLookAndFeel(&m_inputLF);
-    m_expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
-    m_expressionInput.setFont(m_lookAndFeel.getFont());
+    //m_expressionInput.setLookAndFeel(&m_inputLF);
+    //m_expressionInput.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    //m_expressionInput.setFont(m_lookAndFeel.getFont());
+    //m_expressionInput.setText(ipText, juce::dontSendNotification);
 
     std::string ipText = m_tree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
     if (ipText == "") { ipText = "x"; }
-    m_expressionInput.setText(ipText, juce::dontSendNotification);
+    m_document.insertText(0, ipText);
+    addAndMakeVisible(&m_codeEditor);
     m_graphing.updateExpr(m_expressionInput.getText().toStdString());
-    auto dParam = m_tree.getParameter("D");
-    auto dv = dParam->getNormalisableRange().convertFrom0to1(dParam->getValue());
-    m_graphing.setDistortionCoeff(dv);
-    auto yParam = m_tree.getParameter("Y");
-    auto rangedY = yParam->getNormalisableRange().convertFrom0to1(yParam->getValue());
-    m_graphing.setY(rangedY);
-    auto zParam = m_tree.getParameter("Z");
-    auto dz = zParam->getNormalisableRange().convertFrom0to1(zParam->getValue());
-    m_graphing.setZ(dz);
-
+    initialiseGraphingParams();
     addAndMakeVisible(&m_expressionLabel);
-
     
     m_hxLabel.setColour(juce::TextEditor::textColourId, juce::Colour(0xFF7F7F7F));
     m_hxLabel.setText("H(s)=", juce::dontSendNotification);
@@ -53,31 +46,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     addAndMakeVisible(&m_hxLabel);
     addAndMakeVisible(&m_filterPanel);
     addAndMakeVisible(&m_gatePanel);
-    auto selectedPanel = m_tree.state.getChildWithName("Internal").getProperty("Page");
-    auto intPanel = static_cast<int>(selectedPanel);
-    switch (intPanel)
-    {
-        case 0: {
-            // Graph
-            m_graphing.setVisible(true);
-            m_gatePanel.setVisible(false);
-            m_filterPanel.setVisible(false);
-            break;
-        }
-        case 1: {
-            // Gate
-            m_graphing.setVisible(false);
-            m_gatePanel.setVisible(true);
-            m_filterPanel.setVisible(false);
-            break;
-        }
-        case 2: {
-            m_graphing.setVisible(false);
-            m_gatePanel.setVisible(false);
-            m_filterPanel.setVisible(true);
-            break;
-        }
-    }
+    initialiseShownPanel();
     addAndMakeVisible(&m_registerClearButton);
     addAndMakeVisible(&m_panicButton);
     addAndMakeVisible(&m_filterButton);
@@ -93,22 +62,31 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
 
     m_helpBlock.setFont(m_lookAndFeel.getFont());
     m_helpBlock.setColour(juce::TextEditor::textColourId, juce::Colour(100, 100, 100));
-    m_expressionInput.onReturnKey = [this] {
+    //m_expressionInput.onReturnKey = [this] {
+    //    try {
+    //
+    //        m_audioProcessor.setContext(m_expressionInput.getText().toStdString());
+    //        m_graphing.updateExpr(m_expressionInput.getText().toStdString());
+    //    }
+    //    catch(std::exception& e){
+    //        //Don't
+    //    }
+    //    m_expressionInput.unfocusAllComponents();
+    //};
+    m_codeEditor.onReturnKey = [this] {
         try {
+            m_audioProcessor.setContext(m_document.getAllContent().toStdString());
+            m_graphing.updateExpr(m_document.getAllContent().toStdString());
+        }
+        catch (std::exception& e) {
 
-            m_audioProcessor.setContext(m_expressionInput.getText().toStdString());
-            m_graphing.updateExpr(m_expressionInput.getText().toStdString());
         }
-        catch(std::exception& e){
-            //Don't
-        }
-        m_expressionInput.unfocusAllComponents();
     };
     addAndMakeVisible(&m_expressionInput);
     m_helpBlock.setMultiLine(true);
 
-    m_displayText << "<b>Variables</b>:\nx: Input Sample\nd: distortion coefficient (0 to 10)\ny: user defined (0 to 1)\nz: user defined (0 to 1)\ngpr[0...4]: general purpose registers\n\n";
-    m_displayText << "Logical:\nand, nand, mand, &, nor, xor, |, nor, xnor, not, \n\n";
+    m_displayText << "Variables:\nx: Input Sample\nd: distortion coefficient (0 to 10)\ny: user defined (0 to 1)\nz: user defined (0 to 1)\ngpr[0...4]: general purpose registers\n\n";
+    m_displayText << "Logical:\nand, nand, mand, &, nor, xor, |, xnor, not, \n\n";
     m_displayText << "General:\nabs(x), avg(x,y..), ceil(x), clamp(mn,x,mx), equal(x,y), erf(x), erfc(x), exp(x), expm1(x), floor(x), frac(x), hypot(x,y), iclamp(mn,x,mx),";
     m_displayText << "inrange(mn,x,mx), log(x), log10(x), log1p(x), log2(x), logn(x,n), max(x,y..), min(x,y..), mul(x,y..), ncdf(x), not_equal(x,y), pow(x,y), root(x,n),";
     m_displayText << "round(x), roundn(x,n), sgn(x), sqrt(x), sum(x,y..), swap(x,y), trunc(x)\n\n";
@@ -132,10 +110,15 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     addAndMakeVisible(&m_sizeButtons);
     //setWantsKeyboardFocus(true);
     resized();
+    // If we have errors from initialising the processor, handle them.. 
+    if (ErrorReporter::getInstance()->hasError()) {
+        showError(ErrorReporter::getInstance()->getErrors());
+    }
 }
 
 TransferAudioProcessorEditor::~TransferAudioProcessorEditor()
 {
+    ErrorReporter::getInstance()->removeEditor();
     m_expressionInput.setLookAndFeel(nullptr);
     m_expressionInput.setLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
@@ -199,6 +182,73 @@ void TransferAudioProcessorEditor::onLabelButtonClicked(LabelButton* l)
     }
 }
 
+void TransferAudioProcessorEditor::codeDocumentTextInserted(const juce::String& newText, int insertIndex)
+{
+    ErrorReporter::getInstance()->clearErrors();
+}
+
+void TransferAudioProcessorEditor::codeDocumentTextDeleted(int startIndex, int endIndex)
+{
+    ErrorReporter::getInstance()->clearErrors();
+}
+
+void TransferAudioProcessorEditor::showError(const std::vector<error_t>& errors)
+{
+    std::stringstream errorStream;
+    for (auto& err : errors) {
+        errorStream << err.diagnostic << " (pos: " << err.token.position << ", token: \"" << err.token.value << "\")" << "\n";
+        //errorStream << "position: " << err.token.position << " token: \"" << err.token.value << "\"\n" << exprtk::parser_error::to_str(err.mode) << "\n";
+    }
+    m_codeEditor.toggleErrorMode(true, juce::String(errorStream.str()));
+}
+
+void TransferAudioProcessorEditor::clearErrors()
+{
+    m_codeEditor.toggleErrorMode(false);
+}
+
+void TransferAudioProcessorEditor::initialiseGraphingParams()
+{
+    auto dParam = m_tree.getParameter("D");
+    auto dv = dParam->getNormalisableRange().convertFrom0to1(dParam->getValue());
+    m_graphing.setDistortionCoeff(dv);
+    auto yParam = m_tree.getParameter("Y");
+    auto rangedY = yParam->getNormalisableRange().convertFrom0to1(yParam->getValue());
+    m_graphing.setY(rangedY);
+    auto zParam = m_tree.getParameter("Z");
+    auto dz = zParam->getNormalisableRange().convertFrom0to1(zParam->getValue());
+    m_graphing.setZ(dz);
+}
+
+void TransferAudioProcessorEditor::initialiseShownPanel()
+{
+    auto selectedPanel = m_tree.state.getChildWithName("Internal").getProperty("Page");
+    auto intPanel = static_cast<int>(selectedPanel);
+    switch (intPanel)
+    {
+    case 0: {
+        // Graph
+        m_graphing.setVisible(true);
+        m_gatePanel.setVisible(false);
+        m_filterPanel.setVisible(false);
+        break;
+    }
+    case 1: {
+        // Gate
+        m_graphing.setVisible(false);
+        m_gatePanel.setVisible(true);
+        m_filterPanel.setVisible(false);
+        break;
+    }
+    case 2: {
+        m_graphing.setVisible(false);
+        m_gatePanel.setVisible(false);
+        m_filterPanel.setVisible(true);
+        break;
+    }
+    }
+}
+
 
 //==============================================================================
 void TransferAudioProcessorEditor::paint (juce::Graphics& g)
@@ -214,7 +264,8 @@ void TransferAudioProcessorEditor::resized()
     m_expressionLabel.setBounds(0, h / 5, getWidth(), h / 2);
     m_sizeButtons.setBounds(getWidth() - getWidth() / 5, 0, getWidth() / 5, h / 4);
     m_hxLabel.setBounds(0, h, getWidth() / 16, h / 4);
-    m_expressionInput.setBounds(getWidth() / 16, h, (getWidth() - m_hxLabel.getWidth()) - 10, h / 4);
+    //m_expressionInput.setBounds(getWidth() / 16, h, (getWidth() - m_hxLabel.getWidth()) - 10, h / 4);
+    m_codeEditor.setBounds(getWidth() / 16, h, (getWidth() - m_hxLabel.getWidth()) - 10, h / 4);
     m_helpBlock.setBounds(0, h * 1.5, getWidth() / 2 - getWidth() / 10 - 1 , getHeight() - h*3);
     m_helpBlock.applyFontToAllText(LF::createFont().withHeight(m_helpBlock.getHeight() / 50.0f));
     m_graphing.setBounds(getWidth() / 2 , (h*1.5) + 10, getWidth() / 2, (getHeight() - h*4) - 20);

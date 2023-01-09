@@ -17,6 +17,15 @@
             file="Resources/Wetdreamzmedium-LYxZ.otf"/>
     </GROUP>
     <GROUP id="{73CA8955-08EF-024C-8468-EC8881CF4BB9}" name="Source">
+      <GROUP id="{BC903B7B-CED0-794A-66C9-C26C7A7F5AC3}" name="Utils">
+        <FILE id="q4Ev2V" name="ErrorReporter.cpp" compile="1" resource="0"
+              file="Source/Utils/ErrorReporter.cpp"/>
+        <FILE id="WIuzLg" name="ErrorReporter.h" compile="0" resource="0" file="Source/Utils/ErrorReporter.h"/>
+        <FILE id="mcTEbe" name="ExprtkTokeniser.cpp" compile="1" resource="0"
+              file="Source/Utils/ExprtkTokeniser.cpp"/>
+        <FILE id="ssgcwi" name="ExprtkTokeniser.h" compile="0" resource="0"
+              file="Source/Utils/ExprtkTokeniser.h"/>
+      </GROUP>
       <GROUP id="{E67793DC-E5F9-A37E-BC34-5E981EEBACD6}" name="Types">
         <FILE id="wNCg5X" name="FilterType.h" compile="0" resource="0" file="Source/Types/FilterType.h"/>
       </GROUP>
@@ -37,6 +46,8 @@
         <FILE id="Lq33Ex" name="Graphing.h" compile="0" resource="0" file="Source/UI/Graphing.h"/>
         <FILE id="P9OkwP" name="LabelButton.h" compile="0" resource="0" file="Source/UI/LabelButton.h"/>
         <FILE id="lGhxlt" name="LF.h" compile="0" resource="0" file="Source/UI/LF.h"/>
+        <FILE id="xEZclJ" name="TransferCodeEditor.h" compile="0" resource="0"
+              file="Source/UI/TransferCodeEditor.h"/>
       </GROUP>
       <FILE id="tGAovB" name="Expression.h" compile="0" resource="0" file="Source/Expression.h"/>
       <FILE id="gSobzP" name="PluginProcessor.cpp" compile="1" resource="0"
