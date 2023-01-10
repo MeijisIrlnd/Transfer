@@ -41,7 +41,7 @@ private:
         VARIABLE,
         BRACKET,
         FUNCTION,
-        IDENTIFIER,
+        NUMERAL,
         OPERATOR,
         CONTROL_FLOW
     };

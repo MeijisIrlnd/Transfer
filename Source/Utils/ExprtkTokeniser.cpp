@@ -39,7 +39,7 @@ int ExprtkTokeniser::readNextToken(juce::CodeDocument::Iterator& source)
             return parseIdentifier(source);
         source.skip();
         if (isNumeral(firstChar)) {
-            return static_cast<int>(TOKEN_TYPE::IDENTIFIER);
+            return static_cast<int>(TOKEN_TYPE::NUMERAL);
         }
         return static_cast<int>(TOKEN_TYPE::ERROR_TYPE);
     }
@@ -54,12 +54,12 @@ juce::CodeEditorComponent::ColourScheme ExprtkTokeniser::getDefaultColourScheme(
     };
     const Type mapping[] = {
         {"Error", 0xFF230000},
-        {"Variable", 0xFFA0A0A0},
-        {"Bracket", 0xFF232323},
-        {"Function", 0xFF7F7F7F0},
-        {"Identifier", 0xFF000023},
-        {"Operator", 0xFFF0F0F0},
-        {"Control Flow", 0xFFFFFFFF}
+        {"Variable", 0xFF626262},
+        {"Bracket", 0xFF232323}, // LIGHTER
+        {"Function", 0xFF003274}, // BLUE ME 
+        {"Numeral", 0xFF234124},
+        {"Operator", 0xFF000000}, // BLACK ME 
+        {"Control Flow", 0xFF5C2F5B}
     };
     for (auto &el : mapping)
     {
@@ -78,11 +78,12 @@ juce::CodeEditorComponent::ColourScheme ExprtkTokeniser::getErrorColourScheme()
     const Type mapping[] = {
         {"Error", 0xFF230000},
         {"Variable", 0xFFA0A0A0},
-        {"Bracket", 0xFF232323},
-        {"Function", 0xFF7F7F7F0},
-        {"Identifier", 0xFF000023},
-        {"Operator", 0xFFF0F0F0},
-        {"Control Flow", 0xFFFFFFFF}
+        {"Bracket", 0xFF232323}, // LIGHTER
+        {"Function", 0xFF003274}, // BLUE ME 
+        {"Numeral", 0xFF234124},
+        {"Operator", 0xFFFFFFFF}, // BLACK ME 
+        {"Control Flow", 0xFFD89ED7}
+        // NUMBERS GREEN
     };
     for (auto& el : mapping) {
         cs.set(el.name, juce::Colour(0xFF7F0000));
