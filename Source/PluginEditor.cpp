@@ -263,7 +263,7 @@ void TransferAudioProcessorEditor::resized()
     auto h = getHeight() / 10;
     m_expressionLabel.setBounds(0, h / 5, getWidth(), h / 2);
     m_sizeButtons.setBounds(getWidth() - getWidth() / 5, 0, getWidth() / 5, h / 4);
-    m_hxLabel.setBounds(0, h, getWidth() / 16, h / 4);
+    m_hxLabel.setBounds(0, h - h/16, getWidth() / 16, h / 4);
     //m_expressionInput.setBounds(getWidth() / 16, h, (getWidth() - m_hxLabel.getWidth()) - 10, h / 4);
     m_codeEditor.setBounds(getWidth() / 16, h, (getWidth() - m_hxLabel.getWidth()) - 10, h / 4);
     m_helpBlock.setBounds(0, h * 1.5, getWidth() / 2 - getWidth() / 10 - 1 , getHeight() - h*3);
