@@ -6,7 +6,7 @@
               pluginDesc="SM001" companyName="Syl Morrison" companyCopyright="KCU"
               companyWebsite="https://meijisirlnd.github.io" cppLanguageStandard="20"
               pluginCharacteristicsValue="pluginEditorRequiresKeys" pluginAUMainType="'aufx'"
-              pluginAUIsSandboxSafe="1" version="0.0.1" companyEmail="syl.morrison.dev@gmail.com">
+              pluginAUIsSandboxSafe="1" version="0.0.2" companyEmail="syl.morrison.dev@gmail.com">
   <MAINGROUP id="q5aHrr" name="Transfer">
     <GROUP id="{E1BD8A85-B738-0C04-A90A-6AD1615459FF}" name="Resources">
       <FILE id="Bcejyy" name="agree-personal-use.regular.otf" compile="0"
