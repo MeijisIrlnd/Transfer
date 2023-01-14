@@ -30,7 +30,6 @@ struct Expression
         symbolTable.add_variable("prev", previous);
         symbolTable.add_constants();
         expression.register_symbol_table(symbolTable);
-        parser.settings().disable_all_control_structures();
         parser.settings().enable_all_control_structures();
         setExpr(initialExpr);
     }

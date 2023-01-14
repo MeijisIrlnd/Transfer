@@ -14,8 +14,8 @@
 class TransferCodeEditor : public juce::CodeEditorComponent
 {
 public: 
-    TransferCodeEditor(juce::CodeDocument& document, juce::CodeTokeniser* tokeniser) : 
-        juce::CodeEditorComponent(document, tokeniser), m_tokeniser(tokeniser)
+    TransferCodeEditor(juce::CodeDocument& document, juce::CodeTokeniser* tokeniser) :
+        juce::CodeEditorComponent(document, tokeniser), m_tokeniser(tokeniser), m_inErrorMode(false)
     {
         
         setFont(LF::createFont());
@@ -82,6 +82,7 @@ public:
 
     void toggleErrorMode(bool hasError, const juce::String& errorText = "")
     {
+        if (m_inErrorMode == hasError) return;
         auto font = getFont();
         font.setUnderline(hasError);
         setFont(font);
@@ -91,10 +92,12 @@ public:
             m_errorRenderer.reset(new ErrorRenderer(errorText));
             addAndMakeVisible(m_errorRenderer.get());
             m_errorRenderer->setBounds(getLocalBounds());
+            m_inErrorMode = true;
         }
         else {
             removeChildComponent(m_errorRenderer.get());
             m_errorRenderer.reset(nullptr);
+            m_inErrorMode = false;
         }
     }
 private: 
@@ -112,5 +115,5 @@ private:
     private: 
         juce::String m_errorText;
     }; std::unique_ptr<ErrorRenderer> m_errorRenderer{ nullptr };
-
+    bool m_inErrorMode{ false };
 };

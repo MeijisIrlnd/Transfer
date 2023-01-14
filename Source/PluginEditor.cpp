@@ -24,6 +24,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     m_expressionLabel.setFont(m_titleLF.getLabelFont(m_expressionLabel));
     m_expressionLabel.setJustificationType(juce::Justification::centredTop);
     m_expressionLabel.setText("transfer", juce::dontSendNotification);
+    addAndMakeVisible(&m_expressionLabel);
     setLookAndFeel(&m_lookAndFeel);
     addAndMakeVisible(&m_graphing);
 

@@ -25,8 +25,7 @@ TransferAudioProcessor::TransferAudioProcessor()
 #else 
     : 
 #endif
-    parameterTree(*this, nullptr, juce::Identifier("Transfer"), createParameterLayout()), m_distortion(parameterTree),
-    m_oversampler(2, m_oversamplingFactor, juce::dsp::Oversampling<float>::filterHalfBandFIREquiripple)
+    parameterTree(*this, nullptr, juce::Identifier("Transfer"), createParameterLayout()), m_distortion(parameterTree)
 {
     ErrorReporter::init();
     //context.reset(new Expression<float>("x", 0, 0));
@@ -113,10 +112,10 @@ void TransferAudioProcessor::changeProgramName (int index, const juce::String& n
 //==============================================================================
 void TransferAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    m_oversampler.reset();
-    m_oversampler.setUsingIntegerLatency(true);
-    m_oversampler.initProcessing(samplesPerBlock);
-    setLatencySamples(m_oversampler.getLatencyInSamples());
+    m_oversampler.reset(new juce::dsp::Oversampling<float>(getTotalNumOutputChannels(), m_oversamplingFactor, juce::dsp::Oversampling<float>::filterHalfBandFIREquiripple));
+    m_oversampler->setUsingIntegerLatency(true);
+    m_oversampler->initProcessing(samplesPerBlock);
+    setLatencySamples(m_oversampler->getLatencyInSamples());
     m_distortion.prepareToPlay(samplesPerBlock, sampleRate * m_oversamplingFactor);
 }
 
@@ -155,9 +154,9 @@ void TransferAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     juce::dsp::AudioBlock<float> block{ buffer };
-    auto oversampled = m_oversampler.processSamplesUp(block);
+    auto oversampled = m_oversampler->processSamplesUp(block);
     m_distortion.getNextAudioBlock(oversampled);
-    m_oversampler.processSamplesDown(block);
+    m_oversampler->processSamplesDown(block);
 }
 
 //==============================================================================

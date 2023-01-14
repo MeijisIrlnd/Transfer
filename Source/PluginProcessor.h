@@ -66,7 +66,7 @@ private:
     const size_t m_oversamplingFactor{ 4 }; // 16x
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout() noexcept;
     juce::AudioProcessorValueTreeState parameterTree;
-    juce::dsp::Oversampling<float> m_oversampler;
+    std::unique_ptr<juce::dsp::Oversampling<float> > m_oversampler{ nullptr };
     std::unique_ptr<Expression<float>> context;
     Transfer::Audio::Distortion m_distortion;
     double currentCoefficient = 1;

@@ -81,7 +81,7 @@ class TitleLF : public juce::LookAndFeel_V4
 public:
     TitleLF()
     {
-        setColour(juce::Label::ColourIds::textColourId, juce::Colour(0x237F7F7F));
+        setColour(juce::Label::ColourIds::textColourId, juce::Colour(0xFFA0A0A0));
     }
 
     ~TitleLF() override { }
