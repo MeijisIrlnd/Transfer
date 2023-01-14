@@ -64,7 +64,6 @@ private:
     ExprtkTokeniser m_tokeniser;
     juce::CodeDocument m_document;
     TransferCodeEditor m_codeEditor;
-    juce::TextEditor m_expressionInput;
     juce::TextEditor m_helpBlock;
     
     juce::Label m_distortionCoefficientLabel, m_yLabel, m_zLabel;

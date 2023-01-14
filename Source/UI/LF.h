@@ -102,4 +102,7 @@ public:
 
     ~InputLF() override {}
     
+    juce::Font getLabelFont(juce::Label& label) override {
+        return juce::Font(LF::createFont().withHeight(label.getHeight() / 2));
+    }
 };

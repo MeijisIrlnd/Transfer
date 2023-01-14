@@ -20,14 +20,23 @@ public:
         
         setFont(LF::createFont());
         setLineNumbersShown(false);
-        setHasFocusOutline(true);
+        setHasFocusOutline(false);
         setScrollbarThickness(3);
-
     }
 
     ~TransferCodeEditor() override
     {
 
+    }
+
+    void paint(juce::Graphics& g) override {
+
+        // The fucking clip region means I can't do anything about drawing another fucking rectangle here
+        juce::CodeEditorComponent::paint(g);
+    }
+
+    void resized() override {
+        juce::CodeEditorComponent::resized();
     }
     void focusGained(juce::Component::FocusChangeType cause) override
     {
@@ -35,6 +44,7 @@ public:
             m_errorRenderer->setInterceptsMouseClicks(false, false);
         }
         juce::CodeEditorComponent::focusGained(cause);
+        getParentComponent()->repaint();
     }
 
     void focusLost(juce::Component::FocusChangeType cause) override
@@ -43,6 +53,7 @@ public:
             m_errorRenderer->setInterceptsMouseClicks(true, true);
         }
         juce::CodeEditorComponent::focusLost(cause);
+        getParentComponent()->repaint();
     }
 
     
@@ -101,4 +112,5 @@ private:
     private: 
         juce::String m_errorText;
     }; std::unique_ptr<ErrorRenderer> m_errorRenderer{ nullptr };
+
 };
