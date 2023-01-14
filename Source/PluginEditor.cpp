@@ -31,6 +31,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     std::string ipText = m_tree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
     if (ipText == "") { ipText = "x"; }
     m_document.insertText(0, ipText);
+    m_graphing.updateExpr(ipText);
     addAndMakeVisible(&m_codeEditor);
     initialiseGraphingParams();
     
