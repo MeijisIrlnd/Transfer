@@ -62,7 +62,9 @@ public:
     void setZ(double newZ);
     SDSP_INLINE void clearRegisters() { if (context != nullptr) context->zeroRegisters(); }
     void setOversamplingFactor(const size_t newFactor);
+    void setSize(const int sizeIndex);
 private:
+    ErrorReporter m_errorReporter;
     size_t m_oversamplingFactor{ 4 }; // 16x
     std::atomic_bool m_needsPrepare{ false };
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout() noexcept;

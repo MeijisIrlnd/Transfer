@@ -19,7 +19,7 @@
 template <typename T>
 struct Expression
 {
-    Expression<T>(std::string initialExpr, T coeff, T cz) : distortionCoefficient(coeff), z(cz)
+    Expression<T>(std::string initialExpr, T coeff, T cz, ErrorReporter& errorReporter) : distortionCoefficient(coeff), z(cz), m_errorReporter(errorReporter)
     {
 
         symbolTable.add_variable("x", currentIp);
@@ -52,8 +52,8 @@ struct Expression
                     return 0.0f;
                 }
             };
-            if (ErrorReporter::getInstance()->hasError()) {
-                ErrorReporter::getInstance()->clearErrors();
+            if (m_errorReporter.hasError()) {
+                m_errorReporter.clearErrors();
             }
         }
         else {
@@ -62,7 +62,7 @@ struct Expression
             for (auto i = 0; i < parser.error_count(); i++) {
                 errors[i] = parser.get_error(i);
             }
-            ErrorReporter::getInstance()->report(errors);
+            m_errorReporter.report(errors);
             transferFunction = [this](float x) { return x; };
         }
     }
@@ -83,6 +83,7 @@ struct Expression
 
 private: 
 
+    ErrorReporter& m_errorReporter;
     T currentIp = 0;
     exprtk::symbol_table<T> symbolTable;
     exprtk::expression<T> expression;

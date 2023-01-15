@@ -10,16 +10,19 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcessor& p, juce::AudioProcessorValueTreeState& t)
-    : AudioProcessorEditor(&p), m_audioProcessor(p), m_tree(t), m_gatePanel(m_tree), m_filterPanel(m_tree), m_filterButton("Filter", juce::Colour(200, 200, 200), true),
+TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcessor& p, juce::AudioProcessorValueTreeState& t, ErrorReporter& errorReporter)
+    : AudioProcessorEditor(&p), m_audioProcessor(p), m_tree(t), m_errorReporter(errorReporter), m_gatePanel(m_tree), m_filterPanel(m_tree), m_filterButton("Filter", juce::Colour(200, 200, 200), true),
     m_graphButton("Graph", juce::Colour(200, 200, 200), true),
     m_gateButton("Gate", juce::Colour(200, 200, 200), true),
     m_registerClearButton("CLR GPR", juce::Colour(200, 200, 200), true),
     m_panicButton("PANIC", juce::Colour(200, 200, 200), true),
     m_graphing(m_tree), m_codeEditor(m_document, &m_tokeniser),
+    m_sizeButtons(p),
     m_oversamplingButtons(p)
 {
-    setSize (600, 600 * 1.25);
+    auto sizeIdx = static_cast<int>(m_tree.state.getChildWithName("Internal").getProperty("Size"));
+    auto [width, height] = m_sizeButtons[sizeIdx];
+    setSize(width, height);
     m_document.addListener(this);
     m_expressionLabel.setLookAndFeel(&m_titleLF);
     m_expressionLabel.setFont(m_titleLF.getLabelFont(m_expressionLabel));
@@ -98,14 +101,15 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     //setWantsKeyboardFocus(true);
     resized();
     // If we have errors from initialising the processor, handle them.. 
-    if (ErrorReporter::getInstance()->hasError()) {
-        showError(ErrorReporter::getInstance()->getErrors());
+    if (m_errorReporter.hasError()) {
+        showError(m_errorReporter.getErrors());
     }
+    readFromTree();
 }
 
 TransferAudioProcessorEditor::~TransferAudioProcessorEditor()
 {
-    ErrorReporter::getInstance()->removeEditor();
+    m_errorReporter.removeEditor();
     setLookAndFeel(nullptr);
 }
 
@@ -169,12 +173,12 @@ void TransferAudioProcessorEditor::onLabelButtonClicked(LabelButton* l)
 
 void TransferAudioProcessorEditor::codeDocumentTextInserted(const juce::String& newText, int insertIndex)
 {
-    ErrorReporter::getInstance()->clearErrors();
+    m_errorReporter.clearErrors();
 }
 
 void TransferAudioProcessorEditor::codeDocumentTextDeleted(int startIndex, int endIndex)
 {
-    ErrorReporter::getInstance()->clearErrors();
+    m_errorReporter.clearErrors();
 }
 
 void TransferAudioProcessorEditor::showError(const std::vector<error_t>& errors)
@@ -280,7 +284,20 @@ void TransferAudioProcessorEditor::contextChangedInternal(const std::string& new
     m_graphing.updateExpr(newText);
 }
 
-TransferAudioProcessorEditor::SizeController::SizeController() : m_smallButton("S", juce::Colour(0x7F232323), true),
+void TransferAudioProcessorEditor::readFromTree()
+{
+    // Really just need to recolour the buttons..
+    auto state = m_tree.state;
+    int sizeIdx = static_cast<int>(state.getChildWithName("Internal").getProperty("Size"));
+    int oversamplingFactor = static_cast<int>(state.getChildWithName("Internal").getProperty("OversamplingFactor"));
+    auto osOpts = m_oversamplingButtons.getOpts();
+    auto it = std::find(osOpts.begin(), osOpts.end(), oversamplingFactor);
+    auto osIdx = std::distance(osOpts.begin(), it);
+    m_oversamplingButtons.getButtons().operator[](static_cast<size_t>(osIdx))->setBackgroundColour(juce::Colour(0x23000000));
+    m_sizeButtons.getButtons().operator[](static_cast<size_t>(sizeIdx))->setBackgroundColour(juce::Colour(0x23000000));
+}
+
+TransferAudioProcessorEditor::SizeController::SizeController(TransferAudioProcessor& p) : m_processor(p), m_smallButton("S", juce::Colour(0x7F232323), true),
     m_mediumButton("M", juce::Colour(0x7F232323), true),
     m_largeButton("L", juce::Colour(0x7F232323), true),
     m_buttons({&m_smallButton, &m_mediumButton, &m_largeButton}),
@@ -314,9 +331,13 @@ void TransferAudioProcessorEditor::SizeController::onLabelButtonClicked(LabelBut
 {
     auto it = std::find(m_buttons.begin(), m_buttons.end(), l);
     if (it == m_buttons.end()) return;
-    auto [width, height] = m_sizeOpts[std::distance(m_buttons.begin(), it)];
+    size_t idx = std::distance(m_buttons.begin(), it);
+    auto [width, height] = m_sizeOpts[idx];
     getParentComponent()->setSize(width, height);
-    
+    m_processor.setSize(static_cast<int>(idx));
+    for(auto& b : m_buttons) {
+        b->setBackgroundColour(b == l ? juce::Colour(0x23000000) : juce::Colour(0x00FFFFFF));
+    }
 }
 
 
@@ -358,4 +379,7 @@ void TransferAudioProcessorEditor::OversamplingButtons::onLabelButtonClicked(Lab
     if(it == m_buttons.end()) return;
     size_t idx = std::distance(m_buttons.begin(), it);
     m_processor.setOversamplingFactor(m_oversamplingOpts[idx]);
+    for(auto& b : m_buttons) {
+        b->setBackgroundColour(b == l ? juce::Colour(0x23000000) : juce::Colour(0x00FFFFFF));
+    }
 }

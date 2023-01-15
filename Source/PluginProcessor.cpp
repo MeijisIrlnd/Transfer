@@ -27,9 +27,8 @@ TransferAudioProcessor::TransferAudioProcessor()
 #endif
     parameterTree(*this, nullptr, juce::Identifier("Transfer"), createParameterLayout()), m_distortion(parameterTree)
 {
-    ErrorReporter::init();
     //context.reset(new Expression<float>("x", 0, 0));
-    context.reset(new Expression<float>("x", 0, 0));
+    context.reset(new Expression<float>("x", 0, 0, m_errorReporter));
     parameterTree.addParameterListener("D", this);
     parameterTree.addParameterListener("Y", this);
     parameterTree.addParameterListener("Z", this);
@@ -37,7 +36,6 @@ TransferAudioProcessor::TransferAudioProcessor()
 
 TransferAudioProcessor::~TransferAudioProcessor()
 {
-    ErrorReporter::destroy();
 }
 
 void TransferAudioProcessor::parameterChanged(const juce::String& id, float newValue)
@@ -181,8 +179,8 @@ bool TransferAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* TransferAudioProcessor::createEditor()
 {
-    auto* editor = new TransferAudioProcessorEditor(*this, parameterTree);
-    ErrorReporter::getInstance()->setEditor(editor);
+    auto* editor = new TransferAudioProcessorEditor(*this, parameterTree, m_errorReporter);
+    m_errorReporter.setEditor(editor);
     return editor;
 }
 
@@ -195,6 +193,8 @@ void TransferAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
         juce::ValueTree tree(ident);
         tree.setProperty("Function", juce::var("x"), nullptr);
         tree.setProperty("Page", juce::var(0), nullptr);
+        tree.setProperty("Size", juce::var(1), nullptr);
+        tree.setProperty("OversamplingFactor", juce::var(4), nullptr);
         state.addChild(tree, -1, nullptr);
     }
     std::unique_ptr<juce::XmlElement> xmlState(state.createXml());
@@ -212,11 +212,14 @@ void TransferAudioProcessor::setStateInformation (const void* data, int sizeInBy
                 juce::ValueTree tree(ident);
                 tree.setProperty("Function", juce::var("x"), nullptr);
                 tree.setProperty("Page", juce::var(0), nullptr);
+                tree.setProperty("OversamplingFactor", juce::var(4), nullptr);
+                tree.setProperty("Size", juce::var(1), nullptr);
                 currentTree.addChild(tree, -1, nullptr);
             }
             parameterTree.replaceState(juce::ValueTree::fromXml(*xmlState));
         }
     }
+    setOversamplingFactor(static_cast<size_t>(static_cast<int>(parameterTree.state.getChildWithName("Internal").getProperty("OversamplingFactor"))));
     std::string transferStr = parameterTree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
     transferStr = transferStr == "" ? "x" : transferStr;
     setContext(transferStr);
@@ -224,6 +227,9 @@ void TransferAudioProcessor::setStateInformation (const void* data, int sizeInBy
     if (getActiveEditor() != nullptr) {
         TransferAudioProcessorEditor* e = dynamic_cast<TransferAudioProcessorEditor*>(getActiveEditor());
         e->contextChangedInternal(transferStr);
+        // And its size...
+        // ...
+        // ...
     }
  }
 
@@ -272,6 +278,24 @@ void TransferAudioProcessor::setZ(double newZ)
 void TransferAudioProcessor::setOversamplingFactor(const size_t newFactor) {
     m_oversamplingFactor = newFactor;
     m_needsPrepare.store(true);
+    // Write this to the tree also..
+    auto state = parameterTree.state;
+    if(!state.getChildWithName("Internal").isValid()) {
+        juce::Identifier ident("Internal");
+        juce::ValueTree currentTree(ident);
+        parameterTree.state.addChild(currentTree, -1, nullptr);
+    }
+    state.getChildWithName("Internal").setProperty("OversamplingFactor", juce::var(static_cast<int>(newFactor)), nullptr);
+}
+
+void TransferAudioProcessor::setSize(const int sizeIndex) {
+    auto state = parameterTree.state;
+    if(!state.getChildWithName("Internal").isValid()) {
+        juce::Identifier ident("Internal");
+        juce::ValueTree currentTree(ident);
+        parameterTree.state.addChild(currentTree, -1, nullptr);
+    }
+    state.getChildWithName("Internal").setProperty("Size", juce::var(sizeIndex), nullptr);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout TransferAudioProcessor::createParameterLayout() noexcept
