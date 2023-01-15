@@ -284,7 +284,7 @@ TransferAudioProcessorEditor::SizeController::SizeController() : m_smallButton("
     m_mediumButton("M", juce::Colour(0x7F232323), true),
     m_largeButton("L", juce::Colour(0x7F232323), true),
     m_buttons({&m_smallButton, &m_mediumButton, &m_largeButton}),
-    m_sizeOpts({std::tuple<int, int>{300, 300 * 1.25}, std::tuple<int, int>{700, 700 * 1.25}, std::tuple<int, int>{800, 800 * 1.25}})
+    m_sizeOpts({std::tuple<int, int>{500, 500 * 1.25}, std::tuple<int, int>{600, 600 * 1.25}, std::tuple<int, int>{800, 800 * 1.25}})
 {
     for (auto& b : m_buttons) {
         addAndMakeVisible(b);
