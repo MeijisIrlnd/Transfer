@@ -55,6 +55,21 @@ private:
         std::array<LabelButton*, 3> m_buttons;
         std::array<std::tuple<int, int>, 3> m_sizeOpts;
     } m_sizeButtons;
+    class OversamplingButtons : public juce::Component, public LabelButton::Listener
+    {
+    public:
+        OversamplingButtons(TransferAudioProcessor& p);
+        ~OversamplingButtons() override;
+        void paint(juce::Graphics& g) override;
+        void resized() override;
+        void onLabelButtonClicked(LabelButton* l) override;
+    private:
+        juce::Label m_oversamplingLabel;
+        LabelButton m_off, m_4x, m_16x;
+        std::array<LabelButton*, 3> m_buttons;
+        std::array<int, 3> m_oversamplingOpts;
+        TransferAudioProcessor& m_processor;
+    } m_oversamplingButtons;
     juce::TooltipWindow m_tooltipWindow;
     juce::AudioProcessorValueTreeState& m_tree;
     juce::ComponentBoundsConstrainer m_constrainer;

@@ -16,7 +16,8 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     m_gateButton("Gate", juce::Colour(200, 200, 200), true),
     m_registerClearButton("CLR GPR", juce::Colour(200, 200, 200), true),
     m_panicButton("PANIC", juce::Colour(200, 200, 200), true),
-    m_graphing(m_tree), m_codeEditor(m_document, &m_tokeniser)
+    m_graphing(m_tree), m_codeEditor(m_document, &m_tokeniser),
+    m_oversamplingButtons(p)
 {
     setSize (600, 600 * 1.25);
     m_document.addListener(this);
@@ -93,6 +94,7 @@ TransferAudioProcessorEditor::TransferAudioProcessorEditor(TransferAudioProcesso
     LF::instantiateHorizontalSlider(this, &m_zSlider, &m_zLabel, "Z");
     m_zAttachment.reset(new juce::SliderParameterAttachment(*m_tree.getParameter("Z"), m_zSlider));
     addAndMakeVisible(&m_sizeButtons);
+    addAndMakeVisible(&m_oversamplingButtons);
     //setWantsKeyboardFocus(true);
     resized();
     // If we have errors from initialising the processor, handle them.. 
@@ -247,6 +249,7 @@ void TransferAudioProcessorEditor::resized()
     auto h = getHeight() / 10;
     m_expressionLabel.setBounds(0, h / 5, getWidth(), h / 2);
     m_sizeButtons.setBounds(getWidth() - getWidth() / 5, 0, getWidth() / 5, h / 4);
+    m_oversamplingButtons.setBounds(m_sizeButtons.getX(), m_sizeButtons.getY() + m_sizeButtons.getHeight(), getWidth() / 5, h/4);
     m_hxLabel.setBounds(getWidth() / 32, h, getWidth() / 12, h / 4);
     m_codeEditor.setBounds(getWidth() / 32 + getWidth() / 12, h, getWidth() - getWidth() / 16 - getWidth() / 12, h / 4);
     m_helpBlock.setBounds(0, h * 1.5, getWidth() / 2 - getWidth() / 10 - 1 , getHeight() - h*3);
@@ -281,7 +284,7 @@ TransferAudioProcessorEditor::SizeController::SizeController() : m_smallButton("
     m_mediumButton("M", juce::Colour(0x7F232323), true),
     m_largeButton("L", juce::Colour(0x7F232323), true),
     m_buttons({&m_smallButton, &m_mediumButton, &m_largeButton}),
-    m_sizeOpts({std::tuple<int, int>{600, 600 * 1.25}, std::tuple<int, int>{700, 700 * 1.25}, std::tuple<int, int>{800, 800 * 1.25}})
+    m_sizeOpts({std::tuple<int, int>{300, 300 * 1.25}, std::tuple<int, int>{700, 700 * 1.25}, std::tuple<int, int>{800, 800 * 1.25}})
 {
     for (auto& b : m_buttons) {
         addAndMakeVisible(b);
@@ -314,4 +317,45 @@ void TransferAudioProcessorEditor::SizeController::onLabelButtonClicked(LabelBut
     auto [width, height] = m_sizeOpts[std::distance(m_buttons.begin(), it)];
     getParentComponent()->setSize(width, height);
     
+}
+
+
+TransferAudioProcessorEditor::OversamplingButtons::OversamplingButtons(TransferAudioProcessor& p) :
+    m_off("OFF", juce::Colour(0x7F232323), true),
+    m_4x("4X", juce::Colour(0x7F232323), true),
+    m_16x("16X", juce::Colour(0x7F232323), true),
+    m_buttons({&m_off, &m_4x, &m_16x}),
+    m_oversamplingOpts({0, 2, 4}),
+    m_processor(p)
+{
+    for(auto& b : m_buttons) {
+        addAndMakeVisible(b);
+        b->addListener(this);
+    }
+}
+
+TransferAudioProcessorEditor::OversamplingButtons::~OversamplingButtons() {
+
+}
+
+void TransferAudioProcessorEditor::OversamplingButtons::paint(juce::Graphics& g)
+{
+    
+}
+
+void TransferAudioProcessorEditor::OversamplingButtons::resized()
+{
+    auto w = getWidth() / 4;
+    m_oversamplingLabel.setBounds(0, 0, w, getHeight());
+    for(auto i = 0; i < m_buttons.size(); i++) {
+        m_buttons[i]->setBounds(m_oversamplingLabel.getWidth() + (i * w), m_oversamplingLabel.getY(), w, getHeight());
+    }
+}
+
+void TransferAudioProcessorEditor::OversamplingButtons::onLabelButtonClicked(LabelButton *l)
+{
+    auto it = std::find(m_buttons.begin(), m_buttons.end(), l);
+    if(it == m_buttons.end()) return;
+    size_t idx = std::distance(m_buttons.begin(), it);
+    m_processor.setOversamplingFactor(m_oversamplingOpts[idx]);
 }

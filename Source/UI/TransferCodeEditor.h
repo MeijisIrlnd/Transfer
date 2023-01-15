@@ -56,7 +56,7 @@ public:
         getParentComponent()->repaint();
     }
 
-    
+    void setTemporaryUnderlining(const juce::Array<juce::Range<int>> &) override { }
     bool pasteFromClipboard() override
     {
         //newTransaction();

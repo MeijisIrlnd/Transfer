@@ -61,9 +61,10 @@ public:
     void setY(double newY);
     void setZ(double newZ);
     SDSP_INLINE void clearRegisters() { if (context != nullptr) context->zeroRegisters(); }
-
+    void setOversamplingFactor(const size_t newFactor);
 private:
-    const size_t m_oversamplingFactor{ 4 }; // 16x
+    size_t m_oversamplingFactor{ 4 }; // 16x
+    std::atomic_bool m_needsPrepare{ false };
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout() noexcept;
     juce::AudioProcessorValueTreeState parameterTree;
     std::unique_ptr<juce::dsp::Oversampling<float> > m_oversampler{ nullptr };
@@ -72,6 +73,10 @@ private:
     double currentCoefficient = 1;
     double currentY{ 0 };
     double currentZ = 0;
+    struct BufferSettings {
+        int samplesPerBlockExpected;
+        double sampleRate;
+    } m_currentBufferSettings;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransferAudioProcessor)

@@ -112,11 +112,15 @@ void TransferAudioProcessor::changeProgramName (int index, const juce::String& n
 //==============================================================================
 void TransferAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    m_oversampler.reset(new juce::dsp::Oversampling<float>(getTotalNumOutputChannels(), m_oversamplingFactor, juce::dsp::Oversampling<float>::filterHalfBandFIREquiripple));
-    m_oversampler->setUsingIntegerLatency(true);
-    m_oversampler->initProcessing(samplesPerBlock);
-    setLatencySamples(m_oversampler->getLatencyInSamples());
-    m_distortion.prepareToPlay(samplesPerBlock, sampleRate * m_oversamplingFactor);
+    if(m_oversamplingFactor != 0){
+        m_oversampler.reset(new juce::dsp::Oversampling<float>(getTotalNumOutputChannels(), m_oversamplingFactor, juce::dsp::Oversampling<float>::filterHalfBandFIREquiripple));
+        m_oversampler->setUsingIntegerLatency(true);
+        m_oversampler->initProcessing(samplesPerBlock);
+        setLatencySamples(m_oversampler->getLatencyInSamples());
+    }
+    m_distortion.prepareToPlay(samplesPerBlock, m_oversamplingFactor == 0 ? sampleRate : sampleRate * m_oversamplingFactor);
+    m_currentBufferSettings = {samplesPerBlock, sampleRate};
+    m_needsPrepare.store(false);
 }
 
 void TransferAudioProcessor::releaseResources()
@@ -153,10 +157,20 @@ void TransferAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    if(m_needsPrepare.load()) {
+        prepareToPlay(m_currentBufferSettings.sampleRate, m_currentBufferSettings.samplesPerBlockExpected);
+    }
+
     juce::dsp::AudioBlock<float> block{ buffer };
-    auto oversampled = m_oversampler->processSamplesUp(block);
-    m_distortion.getNextAudioBlock(oversampled);
-    m_oversampler->processSamplesDown(block);
+    if(m_oversamplingFactor != 0){
+        auto oversampled = m_oversampler->processSamplesUp(block);
+        m_distortion.getNextAudioBlock(oversampled);
+        m_oversampler->processSamplesDown(block);
+    }
+    else {
+        m_distortion.getNextAudioBlock(block);
+    }
+    
 }
 
 //==============================================================================
@@ -204,6 +218,7 @@ void TransferAudioProcessor::setStateInformation (const void* data, int sizeInBy
         }
     }
     std::string transferStr = parameterTree.state.getChildWithName("Internal").getProperty("Function").toString().toStdString();
+    transferStr = transferStr == "" ? "x" : transferStr;
     setContext(transferStr);
     // if the UI exists, update its context too...
     if (getActiveEditor() != nullptr) {
@@ -252,6 +267,11 @@ void TransferAudioProcessor::setZ(double newZ)
 {
     currentZ = newZ;
     if (context != nullptr) context->setZ(newZ);
+}
+
+void TransferAudioProcessor::setOversamplingFactor(const size_t newFactor) {
+    m_oversamplingFactor = newFactor;
+    m_needsPrepare.store(true);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout TransferAudioProcessor::createParameterLayout() noexcept
