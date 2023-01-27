@@ -10,9 +10,9 @@
 
 #pragma once
 #include <JuceHeader.h>
-#include <SDSP/SDSP.h>
 #include <Audio/PreEmphasisFilter.h>
 #include <Audio/Gate.h>
+#include <SDSP/SDSP.h>
 namespace Transfer::Audio
 {
     class Distortion : public APVTS::Listener

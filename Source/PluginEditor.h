@@ -23,6 +23,8 @@
 //==============================================================================
 /**
 */
+using namespace Transfer;
+using namespace Transfer::UI;
 class TransferAudioProcessorEditor  : public juce::AudioProcessorEditor, public LabelButton::Listener, public juce::CodeDocument::Listener
 {
 public:

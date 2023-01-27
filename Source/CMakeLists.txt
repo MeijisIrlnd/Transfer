@@ -1,0 +1,11 @@
+set(SOURCE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/PluginProcessor.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/PluginEditor.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Audio/Distortion.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Audio/Gate.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Audio/PreEmphasisFilter.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/UI/FilterPanel.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utils/ErrorReporter.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utils/ExprtkTokeniser.cpp 
+    PARENT_SCOPE 
+)

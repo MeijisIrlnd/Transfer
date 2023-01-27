@@ -14,13 +14,14 @@
 *.user
 *.userosscache
 *.sln.docstates
-
+.DS_Store
+.DS_Store?
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
 # Mono auto generated files
 mono_crash.*
-
+[Bb]uild/
 # Build results
 [Bb]uilds/
 [Dd]ebug/

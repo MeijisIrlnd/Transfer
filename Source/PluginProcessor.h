@@ -15,6 +15,7 @@
 //==============================================================================
 /**
 */
+using namespace Transfer;
 class TransferAudioProcessor  : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
@@ -70,7 +71,7 @@ private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout() noexcept;
     juce::AudioProcessorValueTreeState parameterTree;
     std::unique_ptr<juce::dsp::Oversampling<float> > m_oversampler{ nullptr };
-    std::unique_ptr<Expression<float>> context;
+    std::unique_ptr<Transfer::Expression<float>> context{nullptr};
     Transfer::Audio::Distortion m_distortion;
     double currentCoefficient = 1;
     double currentY{ 0 };

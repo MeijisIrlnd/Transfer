@@ -10,8 +10,9 @@
 
 #pragma once
 #include <JuceHeader.h>
-#include <SDSP/SDSP.h>
 #include <Types/FilterType.h>
+#include <SDSP/SDSP.h>
+using APVTS = juce::AudioProcessorValueTreeState;
 namespace Transfer::Audio
 {
     class PreEmphasisFilter : public APVTS::Listener

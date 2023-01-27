@@ -1,6 +1,6 @@
 [submodule "Include/DSPCommon"]
 	path = Include/DSPCommon
 	url = https://github.com/MeijisIrlnd/DSPCommon.git
-[submodule "Include/SDSP"]
-	path = Include/SDSP
+[submodule "Modules/SDSP"]
+	path = Modules/SDSP
 	url = https://github.com/MeijisIrlnd/SDSP.git

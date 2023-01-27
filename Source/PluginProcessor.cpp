@@ -28,7 +28,7 @@ TransferAudioProcessor::TransferAudioProcessor()
     parameterTree(*this, nullptr, juce::Identifier("Transfer"), createParameterLayout()), m_distortion(parameterTree)
 {
     //context.reset(new Expression<float>("x", 0, 0));
-    context.reset(new Expression<float>("x", 0, 0, m_errorReporter));
+    context.reset(new Transfer::Expression<float>("x", 0, 0, m_errorReporter));
     parameterTree.addParameterListener("D", this);
     parameterTree.addParameterListener("Y", this);
     parameterTree.addParameterListener("Z", this);
