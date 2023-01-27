@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.7.2)
 project(Transfer VERSION 0.0.2)
-find_package(JUCE CONFIG REQUIRED)
+include(FetchContent)
+FetchContent_Declare(
+    JUCE 
+    GIT_REPOSITORY https://github.com/juce-framework/JUCE.git 
+    GIT_TAG 7.0.5
+)
+FetchContent_MakeAvailable(JUCE)
+#find_package(JUCE CONFIG REQUIRED)
 set(CMAKE_CXX_STANDARD 20)
 juce_add_plugin(Transfer
 COMPANY_NAME Syl Morrison
