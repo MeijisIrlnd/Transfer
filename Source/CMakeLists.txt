@@ -1,0 +1,11 @@
+set(SOURCE 
+    PluginProcessor.cpp 
+    PluginEditor.cpp 
+    Audio/Distortion.cpp 
+    Audio/Gate.cpp 
+    Audio/PreEmphasisFilter.cpp 
+    UI/FilterPanel.cpp 
+    Utils/ErrorReporter.cpp 
+    Utils/ExprtkTokeniser.cpp 
+    PARENT_SCOPE 
+)
