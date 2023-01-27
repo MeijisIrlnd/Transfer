@@ -1,4 +1,5 @@
 # Transfer
+![CMake](https://github.com/MeijisIrlnd/Transfer/actions/workflows/ci.yml/badge.svg)
 #### because normal distortions are boring
 ![image](https://user-images.githubusercontent.com/38221014/210483486-0d4fb6f0-b8e3-4efa-83a4-afd8b2d7dabe.png)
 ## about 
